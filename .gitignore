@@ -10,3 +10,22 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/Vocabulary/build.xml
+/Vocabulary/nbproject
+/Vocabulary/tmp
+/Vocabulary/build.xml
+/Vocabulary/build-onejar.xml
+/Vocabulary/one-jar-ant-task-0.97.jar
+/Vocabulary/vocabulary-log4j.xml
+/Vocabulary/bin
+/Vocabulary/build
+/Vocabulary/logs
+build.xml
+build-onejar.xml
+one-jar-ant-task-0.97.jar
+vocabulary-log4j.xml
+bin
+build
+logs
+nbproject
+tmp
