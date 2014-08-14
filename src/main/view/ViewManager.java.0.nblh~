@@ -1,0 +1,29 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package main.view;
+
+import java.awt.Font;
+import javax.swing.UIManager;
+
+/**
+ *
+ * @author Aaron
+ */
+public final class ViewManager
+{
+    public static final Font ARIAL12 = new Font("arial", Font.PLAIN, 12);
+    public static final Font ARIAL14 = new Font("arial", Font.PLAIN, 14);
+    
+    /**
+     Private constructor to prevent initialization
+     */
+    private ViewManager()
+    {}
+    
+    public static void init()
+    {
+        UIManager.put(, ARIAL12)
+    }
+}
