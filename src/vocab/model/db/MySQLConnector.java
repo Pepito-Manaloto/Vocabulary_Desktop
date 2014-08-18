@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.model;
+package vocab.model.db;
 
+import vocab.model.log.LogManager;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,7 +12,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import javax.swing.JOptionPane;
-import main.config.Config;
+import vocab.config.Config;
 
 /**
  *
@@ -28,6 +29,10 @@ public final class MySQLConnector
     
     private MySQLConnector(){};
     
+    /**
+     * Sets MySQL properties from the property file.
+     * @return true on success, else false
+     */
     public static boolean setProperties()
     {
         boolean result;
@@ -42,9 +47,7 @@ public final class MySQLConnector
             url = properties.getProperty(Config.DB_URL.toString());
             driver = properties.getProperty(Config.DB_DRIVER.toString());
 
-            result = true;
- 
-            
+            result = true; 
         }
         catch (final IOException ex)
         {
@@ -56,9 +59,8 @@ public final class MySQLConnector
     }
     
     /**
-     Gets a connection from the database. Uses a hard coded username an password.
-     
-     @return a MySQL JDBC connection
+     * Gets a connection from the database. Uses a hard coded username an password.
+     * @return a MySQL JDBC connection
      */
     public static Connection connect()  
     {            

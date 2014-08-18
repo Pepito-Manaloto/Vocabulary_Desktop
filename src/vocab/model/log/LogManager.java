@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.model;
+package vocab.model.log;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,7 +25,7 @@ public final class LogManager
      */
     private LogManager()
     {
-        final StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
         
         // Get the last class that calls LogManager
         this.className = stacktrace[stacktrace.length - 1].getClassName();

@@ -2,11 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.model;
+package vocab.model.db;
 
+import vocab.model.log.LogManager;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
-import main.view.MainFrame;
+import vocab.view.MainFrameView;
 
 /**
  *
@@ -14,20 +17,11 @@ import main.view.MainFrame;
  */
 public class VocabularyRecord
 {
-    private Connection con = null;
+    private Connection con;
     private CallableStatement callableProcedure;
-    private ResultSet rs = null;
+    private ResultSet rs;
     private final LogManager logger = LogManager.getInstance();
-    
-    /**
-     * Default constructor initializes database connection.
-     * @throws SQLException
-     */
-    public VocabularyRecord() throws SQLException
-    {
-        this.connectToDb();
-    }
-    
+
     /**
      * adds a new vocabulary in the database and checks if it is successful.
      * @param vocabObject object containing English and foreign word counterpart, and foreign language.
@@ -45,7 +39,7 @@ public class VocabularyRecord
 
             this.callableProcedure.setString(1, vocabObject.getEnglishWord());
             this.callableProcedure.setString(2, vocabObject.getForeignWord());
-            this.callableProcedure.setString(3, vocabObject.getForeignLanguage());
+            this.callableProcedure.setInt(3, vocabObject.getForeignLanguage().getId());
 
             this.callableProcedure.executeUpdate();
 
@@ -81,11 +75,11 @@ public class VocabularyRecord
             this.callableProcedure = this.con.prepareCall(" {CALL Delete_Vocabulary(?,?)} ");
 
             this.callableProcedure.setString(1, englishVocab);
-            this.callableProcedure.setString(2, MainFrame.getforeignLanguage());
+            this.callableProcedure.setString(2, MainFrameView.getforeignLanguage().toString());
 
             this.callableProcedure.executeUpdate();
             this.con.commit();
-            this.logger.info(englishVocab + " in " + MainFrame.getforeignLanguage() + " has been deleted from the database.");
+            this.logger.info(englishVocab + " in " + MainFrameView.getforeignLanguage() + " has been deleted from the database.");
         }
         catch(final SQLException e)
         {
@@ -109,7 +103,7 @@ public class VocabularyRecord
 
             this.callableProcedure.setString(1, vocabObject.getEnglishWord()); 
             this.callableProcedure.setString(2, vocabObject.getForeignWord()); 
-            this.callableProcedure.setString(3, vocabObject.getForeignLanguage()); 
+            this.callableProcedure.setString(3, vocabObject.getForeignLanguage().toString()); 
             this.callableProcedure.setInt(4, column); 
 
             this.callableProcedure.executeUpdate();
@@ -128,11 +122,11 @@ public class VocabularyRecord
     /**
      * Retrieves all vocabulary in the database starting with the selected letter.
      * @param letter selected letter in the sort combobox
-     * @return vocabularies stored in an 2D array Object
+     * @return vocabularies stored in a list
     */
-    public Vocabulary[] getVocabularies(final String letter)
+    public List<Vocabulary> getVocabularies(final String letter)
     {      
-        final int total;
+        int total;
         
         try
         {     
@@ -140,7 +134,7 @@ public class VocabularyRecord
 
             this.callableProcedure = con.prepareCall(" {CALL Show_Vocabulary(?,?,?)} ");
 
-            this.callableProcedure.setString(1, MainFrame.getforeignLanguage());
+            this.callableProcedure.setString(1, MainFrameView.getforeignLanguage().toString());
             this.callableProcedure.setString(2, letter);
             this.callableProcedure.registerOutParameter(3, Types.INTEGER); // total vocabulary
 
@@ -148,11 +142,11 @@ public class VocabularyRecord
 
             total = this.callableProcedure.getInt(3); 
 
-            final Vocabulary vocab[] = new Vocabulary[total];
+            List<Vocabulary> vocab = new ArrayList<>(total);
 
-            for(int i=0; this.rs.next(); i++) 
+            while(this.rs.next()) 
             {
-                vocab[i] = new Vocabulary( rs.getString("english_word"), rs.getString("foreign_word"));
+                vocab.add(new Vocabulary(rs.getString("english_word"), rs.getString("foreign_word")));
             }
 
             return vocab;   
@@ -164,12 +158,12 @@ public class VocabularyRecord
         
         return null;       
     }
-    
+
     /**
      * Connects to the database, if not connected, and sets auto commit to false. 
      * @throws SQLException
      */
-    private void connectToDb() throws SQLException 
+    public void connectToDb() throws SQLException 
     {       
         if(this.con == null || false == this.con.isValid(1))
         {

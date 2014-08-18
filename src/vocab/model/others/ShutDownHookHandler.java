@@ -2,7 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.model;
+package vocab.model.others;
+
+import vocab.model.others.ApplicationLock;
+import vocab.model.db.VocabularyRecord;
 
 /**
  * Class that runs after the application is terminated. Closes and frees all resources.

@@ -112,7 +112,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="try&#xa;{&#xa;    URL url = MainFrame.class.getResource(&quot;/images/search_icon.png&quot;);  &#xa;    final BufferedImage searchIcon = ImageIO.read(url);&#xa;    searchTextField = new javax.swing.JTextField()&#xa;    {&#xa;        protected void paintComponent(Graphics g)&#xa;        {&#xa;            super.paintComponent(g);&#xa;            int y = (getHeight() - searchIcon.getHeight())/2;&#xa;            g.drawImage(searchIcon, 1, y, this);&#xa;        }&#xa;    };&#xa;searchTextField.setMargin(new Insets(0, searchIcon.getWidth(), 0, 0));&#xa;}catch(IOException e){}&#xa;searchTextField.setBounds(10, 305, 170, 25);&#xa;jLayeredPane1.add(searchTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="try&#xa;{&#xa;    URL url = MainFrameView.class.getResource(&quot;/vocab/images/search_icon.png&quot;);  &#xa;    final BufferedImage searchIcon = ImageIO.read(url);&#xa;    searchTextField = new javax.swing.JTextField()&#xa;    {&#xa;        protected void paintComponent(Graphics g)&#xa;        {&#xa;            super.paintComponent(g);&#xa;            int y = (getHeight() - searchIcon.getHeight())/2;&#xa;            g.drawImage(searchIcon, 1, y, this);&#xa;        }&#xa;    };&#xa;searchTextField.setMargin(new Insets(0, searchIcon.getWidth(), 0, 0));&#xa;}catch(IOException e){}&#xa;searchTextField.setBounds(10, 305, 170, 25);&#xa;jLayeredPane1.add(searchTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);"/>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -163,7 +163,7 @@
         <Component class="javax.swing.JLabel" name="background">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/images/background.png"/>
+              <Image iconType="3" name="/vocab/images/background.png"/>
             </Property>
           </Properties>
           <Constraints>

@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.model;
+package vocab.model.others;
 
+import vocab.model.log.LogManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;

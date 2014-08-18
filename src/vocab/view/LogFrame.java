@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.view;
+package vocab.view;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -12,8 +12,8 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import javax.swing.text.*;
-import main.model.LogManager;
-import main.model.LogLevel;
+import vocab.model.log.LogManager;
+import vocab.model.log.LogLevel;
 /**
  *
  * @author Aaron

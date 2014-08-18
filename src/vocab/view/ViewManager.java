@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.view;
+package vocab.view;
 
 import java.awt.Color;
 import java.awt.Font;
