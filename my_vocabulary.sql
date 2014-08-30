@@ -18,6 +18,7 @@ CREATE TABLE `vocabulary`
    PRIMARY KEY(`id`),
    KEY `english_word_index`(`english_word`, `id`),
    KEY `foreign_word_index`(`foreign_word`),
+   UNIQUE KEY `english_foreign_unique`(`english_word`, `foreign_word`),
    FOREIGN KEY(`foreign_id`) REFERENCES `foreign_language`(`id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

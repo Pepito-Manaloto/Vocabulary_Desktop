@@ -153,7 +153,6 @@ public final class ViewPanelView extends javax.swing.JPanel {
         setOpaque(false);
         setLayout(null);
 
-        vocabularyTable.setAutoCreateRowSorter(true);
         vocabularyTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
