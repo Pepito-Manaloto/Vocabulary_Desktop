@@ -40,7 +40,7 @@ public final class MySQLConnector
         try
         {
             final Properties properties = new Properties();
-            properties.load(new FileInputStream("vocabulary.conf"));
+            properties.load(new FileInputStream("conf/vocabulary.conf"));
 
             user = properties.getProperty(Config.DB_USER.toString());
             pw = properties.getProperty(Config.DB_PASS.toString());

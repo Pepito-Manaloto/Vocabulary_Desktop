@@ -26,9 +26,10 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import vocab.model.db.VocabularyRecord;
 import vocab.model.others.CommandLineScript;
+import vocab.view.AboutFrameView;
 import vocab.view.LogFrame;
 import vocab.view.MainFrameView;
-import vocab.view.MainFrameView.PanelName;
+import static vocab.view.MainFrameView.PanelName.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -59,7 +60,7 @@ public class MainFrameController
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    view.showPanel(PanelName.Add);
+                    view.showPanel(Add);
                     view.getSearchTextField().setVisible(false); 
                     view.getSearchTextField().setText("");
                     view.getSuggestListScrollPane().setVisible(false); 
@@ -71,7 +72,7 @@ public class MainFrameController
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    view.showPanel(PanelName.View);
+                    view.showPanel(View);
                     view.getSearchTextField().setVisible(true); 
                     view.getAddPanelView().clearTextfields();
                     view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
@@ -95,6 +96,17 @@ public class MainFrameController
         this.view.addSuggestionListListener(new SuggestionListListener(this.view));
         this.view.addSearchTextFieldListener(new SearchTextFieldListener(this.view));
         this.view.addBackupButtonListener(new BackupListener(this.view));
+        
+        this.view.addAboutMenuItemListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(final ActionEvent e)
+                {
+                    AboutFrameView aboutFrame = new AboutFrameView();
+                    aboutFrame.setLocationRelativeTo(view);
+                    aboutFrame.setVisible(true);
+                }
+            });
         
         this.view.addShowLogsMenuItemListener(new ActionListener()
             {

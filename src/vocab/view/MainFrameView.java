@@ -146,6 +146,15 @@ public final class MainFrameView extends javax.swing.JFrame
     }
 
     /**
+     * Sets the action listener for about menu item.
+     * @param listener the listener
+     */
+    public void addAboutMenuItemListener(final ActionListener listener)
+    {
+        this.aboutMenuItem.addActionListener(listener);
+    }
+    
+    /**
      * Sets the card layout panel to the given panel name.
      * @param name the JPanel name
      */
@@ -256,6 +265,7 @@ public final class MainFrameView extends javax.swing.JFrame
         menuBar = new javax.swing.JMenuBar();
         viewMenu = new javax.swing.JMenu();
         showLogsMenuItem = new javax.swing.JMenuItem();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Vocabulary");
@@ -325,6 +335,9 @@ public final class MainFrameView extends javax.swing.JFrame
         showLogsMenuItem.setToolTipText("");
         viewMenu.add(showLogsMenuItem);
 
+        aboutMenuItem.setText("    About");
+        viewMenu.add(aboutMenuItem);
+
         menuBar.add(viewMenu);
 
         setJMenuBar(menuBar);
@@ -333,6 +346,7 @@ public final class MainFrameView extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JButton addButton;
     private javax.swing.JLabel background;
     private javax.swing.JButton backupButton;
