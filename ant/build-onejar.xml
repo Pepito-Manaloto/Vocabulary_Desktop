@@ -76,9 +76,9 @@
             </lib>
         </one-jar>
 		
-		<fileset dir="${bin.dir}/conf"/>
-		<copy file="${conf.dir}/vocabulary.conf" todir="${bin.dir}/conf"/>
-		<copy file="${conf.dir}/vocabulary-log4j.xml" todir="${bin.dir}/conf"/>
+        <fileset dir="${bin.dir}/conf"/>
+        <copy file="${conf.dir}/vocabulary.conf" todir="${bin.dir}/conf"/>
+        <copy file="${conf.dir}/log4j2.xml" todir="${bin.dir}/conf"/>
     </target>
 	
 	<!-- Creates the javadoc for the source code -->
