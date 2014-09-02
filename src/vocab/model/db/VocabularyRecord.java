@@ -55,7 +55,7 @@ public class VocabularyRecord
         {
             JOptionPane.showMessageDialog(null, vocabObject.getEnglishWord() + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
             success = false;
-            this.logger.error(e.toString());
+            this.logger.error(e.toString(), e);
         }
         
         return success;
@@ -83,7 +83,7 @@ public class VocabularyRecord
         }
         catch(final SQLException e)
         {
-            this.logger.error(e.toString());
+            this.logger.error(e.toString(), e);
         }
     }
     
@@ -115,7 +115,7 @@ public class VocabularyRecord
             final String[] newWord = vocabObject.getEnglishWord().split("/");
                     
             JOptionPane.showMessageDialog(null, newWord[newWord.length - 1] + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-            this.logger.error(e.toString());
+            this.logger.error(e.toString(), e);
         }
     }
     
@@ -153,7 +153,7 @@ public class VocabularyRecord
         }
         catch(final SQLException e)
         {
-            this.logger.error(e.toString());
+            this.logger.error(e.toString(), e);
         }
         
         return null;       
@@ -190,7 +190,7 @@ public class VocabularyRecord
         }
         catch (final SQLException ex)
         {
-            this.logger.error(ex.toString());
+            this.logger.error(ex.toString(), ex);
         }
     }
 }

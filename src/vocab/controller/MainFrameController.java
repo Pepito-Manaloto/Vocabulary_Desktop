@@ -25,9 +25,10 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import vocab.model.db.VocabularyRecord;
+import vocab.model.log.LogManager;
 import vocab.model.others.CommandLineScript;
 import vocab.view.AboutFrameView;
-import vocab.view.LogFrame;
+import vocab.view.LogFrameView;
 import vocab.view.MainFrameView;
 import static vocab.view.MainFrameView.PanelName.*;
 
@@ -113,7 +114,11 @@ public class MainFrameController
                 @Override
                 public void actionPerformed(final ActionEvent e)
                 {
-                    LogFrame logFrame = new LogFrame();
+                    LogFrameView logFrame = new LogFrameView();
+                    LogManager logger = LogManager.getInstance();
+                    LogFrameController logFrameController = new LogFrameController(logFrame, logger);
+                    
+                    logFrameController.addListeners();
                     logFrame.setLocationRelativeTo(view);
                     logFrame.setVisible(true);
                 }
@@ -139,7 +144,7 @@ public class MainFrameController
         @Override
         public void mouseMoved(final MouseEvent e)
         {
-            final int index = this.view.getSuggestionList().locationToIndex(e.getPoint()); // get the index of the word in the list where the pointer is pointing
+            int index = this.view.getSuggestionList().locationToIndex(e.getPoint()); // get the index of the word in the list where the pointer is pointing
 
             this.view.getSuggestionList().setSelectedIndex(index); 
         }
@@ -164,7 +169,7 @@ public class MainFrameController
      */
     private static class SearchTextFieldListener extends KeyAdapter implements CaretListener, FocusListener
     {
-        public static final int SUGGESTION_LIST_ROW_HEIGHT = 23;
+        public static final int SUGGESTION_LIST_ROW_HEIGHT = 22;
         private int[] searchWordIndex;
         private int searchWordCounter;
         private final MainFrameView view;
@@ -191,12 +196,12 @@ public class MainFrameController
         @Override
         public void caretUpdate(final CaretEvent e)
         {           
-            if( this.searchTextField.getText().isEmpty() )
+            if(this.searchTextField.getText().isEmpty())
             {
                 this.suggestListScrollPane.setVisible(false);
             } 
             else
-            {                               
+            {
                 String searchedWord = this.searchTextField.getText();
 
                 this.suggestListScrollPane.setVisible(true); 
@@ -221,32 +226,7 @@ public class MainFrameController
                     this.searchWordIndex[i] = (Integer)searchedWordList.get(i);
                 }
 
-                // only one suggested text left and a row is selected.
-                if(this.suggestionList.getModel().getSize() <= 0 &&
-                   this.vocabularyTable.getSelectedRow() >= 1)
-                {
-                    this.suggestListScrollPane.setVisible(false);
-                } 
-                else // automatically change suggestion list height depending on number of data.
-                {
-                    int listHeight = this.suggestionList.getModel().getSize() * SUGGESTION_LIST_ROW_HEIGHT; // 22 is the height of each row
-                    if(listHeight > 143)   
-                    {
-                        this.suggestListScrollPane.setSize(170, 143); // default 7 rows
-                    }
-                    else
-                    {
-                        this.suggestListScrollPane.setSize(170, listHeight);
-                    }
-                    
-                    this.suggestListScrollPane.setVisible(true);
-   
-                    if(searchedWord.length() <= 1)
-                    {
-                        // deselects selected row/s in the table.
-                        this.vocabularyTable.removeRowSelectionInterval(0, this.vocabularyTable.getRowCount() - 1);
-                    }
-                } 
+                this.updateSuggestionListHeight(searchedWord);
             }
         }
         /**
@@ -316,6 +296,46 @@ public class MainFrameController
         }
         
         /**
+         * Updates the suggestion list height depending on the searched word.
+         * @param searchedWord the word inputted in the search text field
+         */
+        private void updateSuggestionListHeight(final String searchedWord)
+        {
+            // only one suggested text left and a row is selected.
+            if(this.suggestionList.getModel().getSize() <= 0 &&
+               this.vocabularyTable.getSelectedRow() >= 1)
+            {
+                this.suggestListScrollPane.setVisible(false);
+            } 
+            else // automatically change suggestion list height depending on number of data.
+            {
+                int listHeight = (this.suggestionList.getModel().getSize()) * SUGGESTION_LIST_ROW_HEIGHT; // 22 is the height of each row
+
+                if(this.suggestListScrollPane.getHorizontalScrollBar().isVisible())
+                {
+                    listHeight += 17; // add height for scroll bar
+                }
+
+                if(listHeight > 143)   
+                {
+                    this.suggestListScrollPane.setSize(170, 143); // default 7 rows
+                }
+                else
+                {
+                    this.suggestListScrollPane.setSize(170, listHeight);
+                }
+
+                this.suggestListScrollPane.setVisible(true);
+
+                if(searchedWord.length() <= 1)
+                {
+                    // deselects selected row/s in the table.
+                    this.vocabularyTable.removeRowSelectionInterval(0, this.vocabularyTable.getRowCount() - 1);
+                }
+            }
+        }
+        
+        /**
          * Moves selected word in suggest list via up-down arrow keys and enter key.
          * @param e key event
          */
@@ -325,7 +345,11 @@ public class MainFrameController
             int keycode = e.getKeyCode();
             int selectedIndex = this.suggestionList.getSelectedIndex();
 
-            if( keycode == KeyEvent.VK_UP )
+            if(keycode == KeyEvent.VK_BACK_SPACE)
+            {
+                this.updateSuggestionListHeight(this.searchTextField.getText());
+            }
+            else if(keycode == KeyEvent.VK_UP)
             {                     
                 if( selectedIndex > -1 ) // there is a selected word in the list.
                 {
@@ -347,7 +371,7 @@ public class MainFrameController
                 } 
 
             }
-            else if( keycode == KeyEvent.VK_DOWN )
+            else if(keycode == KeyEvent.VK_DOWN)
             {
                 if( selectedIndex > -1 ) // there is a selected word in the list.
                 {
@@ -424,7 +448,7 @@ public class MainFrameController
             DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
             Calendar cal = Calendar.getInstance();
             String currentDate = dateFormat.format(cal.getTime());
-            String backupScript = "mysqldump --routines -uroot -p10906657 --add-drop-database -B my_vocabulary -r \"my_vocabulary (" + currentDate + ").sql\"";
+            String backupScript = "mysqldump --routines -uroot -proot --add-drop-database -B my_vocabulary -r \"my_vocabulary (" + currentDate + ").sql\"";
             String path = "./backup";
             File dir = new File(path);
 
@@ -438,11 +462,11 @@ public class MainFrameController
 
             if(success)
             {
-                JOptionPane.showMessageDialog(this.view, "Backup created successfully", "", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this.view, "Backup created successfully", "Info", JOptionPane.INFORMATION_MESSAGE);
             }    
             else
             {
-                JOptionPane.showMessageDialog(this.view, cmdScript.getErrorMessage(), "", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.view, cmdScript.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

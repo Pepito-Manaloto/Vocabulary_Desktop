@@ -4,7 +4,6 @@
  */
 package vocab.model.others;
 
-import vocab.model.others.ApplicationLock;
 import vocab.model.db.VocabularyRecord;
 
 /**

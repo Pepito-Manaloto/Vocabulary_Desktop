@@ -13,10 +13,8 @@ public enum Config
     DB_URL("db.url"),
     DB_DRIVER("db.driver"),
     DB_USER("db.user"),
-    DB_PASS("db.pass"),
-    
-    DOM_LOG4J_CONFIG("dom.log4j.config");
-    
+    DB_PASS("db.pass");
+
     /** The value of the Config constant. */
     private final String value;
 

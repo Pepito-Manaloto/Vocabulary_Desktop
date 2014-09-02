@@ -8,7 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import org.apache.log4j.Logger;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -19,7 +20,8 @@ public final class LogManager
     private final Logger logger;
     private final String className;
     private static final LogManager logManager = new LogManager();
-
+    private final static AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
+    
     /**
      * Private constructor initializes log4j. 
      */
@@ -29,7 +31,24 @@ public final class LogManager
         
         // Get the last class that calls LogManager
         this.className = stacktrace[stacktrace.length - 1].getClassName();
-        this.logger = Logger.getLogger(this.className);
+        this.logger = org.apache.logging.log4j.LogManager.getLogger();
+    }
+    
+    /**
+     * Gets the value of the log file update flag
+     * @return boolean true if there are updates, else false
+     */
+    public static boolean isUpdated()
+    {
+        return updated.get();
+    }
+    
+    /**
+     * Sets the log file update flag to false.
+     */
+    public static void finishedUpdating()
+    {
+        updated.set(false);
     }
     
     /**
@@ -48,6 +67,7 @@ public final class LogManager
     public void debug(final String message)
     {
        this.logger.debug(this.className + " in " + this.getMethodName() + ": " + message);
+       updated.set(true);
     }
     
     /**
@@ -57,6 +77,7 @@ public final class LogManager
     public void info(final String message)
     {
         this.logger.info(this.className + " in " + this.getMethodName() + ": " + message);
+        updated.set(true);
     }
     
     /**
@@ -66,6 +87,7 @@ public final class LogManager
     public void warn(final String message)
     {
         this.logger.warn(this.className + " in " + this.getMethodName() + ": " + message);
+        updated.set(true);
     }
     
     /**
@@ -75,8 +97,20 @@ public final class LogManager
     public void error(final String message)
     {
         this.logger.error(this.className + " in " + this.getMethodName() + ": " + message);
+        updated.set(true);
     }
     
+    /**
+     * Logs in error level.
+     * @param message the log message
+     * @param e exception stack trace
+     */
+    public void error(final String message, final Throwable e)
+    {
+        this.logger.error(this.className + " in " + this.getMethodName() + ": " + message, e);
+        updated.set(true);
+    }
+
     /**
      * Logs in fatal level.
      * @param message the log message
@@ -84,6 +118,18 @@ public final class LogManager
     public void fatal(final String message)
     {
         this.logger.fatal(this.className + " in " + this.getMethodName() + ": " + message);
+        updated.set(true);
+    }
+
+    /**
+     * Logs in fatal level.
+     * @param message the log message
+     * @param e exception stack trace
+     */
+    public void fatal(final String message, final Throwable e)
+    {
+        this.logger.fatal(this.className + " in " + this.getMethodName() + ": " + message, e);
+        updated.set(true);
     }
 
     /**
@@ -94,9 +140,9 @@ public final class LogManager
      */
     public LinkedHashMap<String, LogLevel> getMessageLogFromFile(final String logPath) throws IOException
     {
-        final LinkedHashMap<String, LogLevel> messageList = new LinkedHashMap<>();
+        LinkedHashMap<String, LogLevel> messageList = new LinkedHashMap<>();
         
-        final BufferedReader br = new BufferedReader(new FileReader(logPath));
+        BufferedReader br = new BufferedReader(new FileReader(logPath));
         String line;
         
         while( (line = br.readLine()) != null) //Gets each message

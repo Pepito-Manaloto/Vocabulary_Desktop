@@ -46,7 +46,7 @@ public final class ApplicationLock
         }
         catch (final IOException ex)
         {
-            this.logger.error(ex.toString());
+            this.logger.error(ex.toString(), ex);
         }
         
     }
@@ -64,7 +64,7 @@ public final class ApplicationLock
         }
         catch (IOException ex)
         {
-            this.logger.error(ex.toString());
+            this.logger.error(ex.toString(), ex);
         }
     }
 }

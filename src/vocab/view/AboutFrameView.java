@@ -10,6 +10,7 @@ import java.util.Map;
 import vocab.main.Main;
 import vocab.main.Main.ManifestAttribute;
 import static vocab.main.Main.ManifestAttribute.*;
+
 /**
  *
  * @author Aaron

@@ -33,11 +33,12 @@ public final class CommandLineScript
     public boolean execute(final String... script)
     {
         boolean successful = false;
+        int result = 0;
 
         try
         {
             this.runtimeProcess = Runtime.getRuntime().exec(script);
-            final int result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
+            result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
 
             if(result == 0)
             {
@@ -47,8 +48,8 @@ public final class CommandLineScript
         catch (final IOException | InterruptedException ex)
         {
             successful = false;
-            this.errorMessage = ex.toString();
-            this.logger.error(ex.toString());
+            this.errorMessage = ex.toString() + " error code=" + result;
+            this.logger.error(ex.toString(), ex);
         }
             
         return successful;
@@ -63,12 +64,13 @@ public final class CommandLineScript
     public boolean execute(final String script, final String outputPath)
     {
         boolean successful = false;
-        final File path = new File(outputPath);
+        File path = new File(outputPath);
+        int result = 0;
 
         try
         {
             this.runtimeProcess = Runtime.getRuntime().exec(script, null, path);
-            final int result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
+            result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
 
             if(result == 0)
             {
@@ -78,10 +80,10 @@ public final class CommandLineScript
         catch (final IOException | InterruptedException ex)
         {
             successful = false;
-            this.errorMessage = ex.toString();
-            this.logger.error(ex.toString());
+            this.errorMessage = ex.toString() + " error code=" + result;
+            this.logger.error(ex.toString(), ex);
         }
-            
+
         return successful;
     }
     
@@ -95,11 +97,12 @@ public final class CommandLineScript
     {
         boolean successful = false;
         File path = new File(outputPath);
+        int result = 0;
 
         try
         {
             this.runtimeProcess = Runtime.getRuntime().exec(script, null, path);
-            final int result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
+            result = this.runtimeProcess.waitFor(); // Returns the result of the runtime execution.
 
             if(result == 0)
             {
@@ -109,8 +112,8 @@ public final class CommandLineScript
         catch (final IOException | InterruptedException ex)
         {
             successful = false;
-            this.errorMessage = ex.toString();
-            this.logger.error(ex.toString());
+            this.errorMessage = ex.toString() + " error code=" + result;
+            this.logger.error(ex.toString(), ex);
         }
             
         return successful;

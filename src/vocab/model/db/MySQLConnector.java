@@ -29,6 +29,11 @@ public final class MySQLConnector
     
     private MySQLConnector(){};
     
+    static
+    {
+        setProperties();
+    }
+    
     /**
      * Sets MySQL properties from the property file.
      * @return true on success, else false
@@ -39,7 +44,7 @@ public final class MySQLConnector
         
         try
         {
-            final Properties properties = new Properties();
+            Properties properties = new Properties();
             properties.load(new FileInputStream("conf/vocabulary.conf"));
 
             user = properties.getProperty(Config.DB_USER.toString());
@@ -52,7 +57,7 @@ public final class MySQLConnector
         catch (final IOException ex)
         {
             result = false;
-            logger.fatal(ex.toString());
+            logger.fatal(ex.toString(), ex);
         }
         
         return result;
@@ -71,9 +76,9 @@ public final class MySQLConnector
             con = DriverManager.getConnection(url, user, pw);
         }
         catch(final SQLException ex)
-        {        ex.printStackTrace();
+        {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Note", JOptionPane.INFORMATION_MESSAGE);
-            logger.fatal(ex.toString());
+            logger.fatal(ex.toString(), ex);
         }
 
         return con;

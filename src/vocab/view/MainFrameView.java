@@ -10,7 +10,6 @@
  */
 package vocab.view;
 
-import vocab.model.log.LogManager;
 import java.awt.CardLayout;
 import java.awt.Graphics;
 import java.awt.Insets;
