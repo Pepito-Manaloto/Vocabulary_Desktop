@@ -21,6 +21,7 @@ public class VocabularyRecord
     private CallableStatement callableProcedure;
     private ResultSet rs;
     private final LogManager logger = LogManager.getInstance();
+    private final String className = this.getClass().getSimpleName();
 
     /**
      * adds a new vocabulary in the database and checks if it is successful.
@@ -48,14 +49,14 @@ public class VocabularyRecord
             if(success)
             {
                 this.con.commit();
-                this.logger.info(vocabObject.toString() + " has been added to the database.");
+                this.logger.info(this.className, "addToDatabase(Vocabulary)", vocabObject.toString() + " has been added to the database.");
             } 
         }
         catch(final SQLException e)
         {
             JOptionPane.showMessageDialog(null, vocabObject.getEnglishWord() + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
             success = false;
-            this.logger.error(e.toString(), e);
+            this.logger.error(this.className, "addToDatabase(Vocabulary)", e.toString(), e);
         }
         
         return success;
@@ -79,11 +80,11 @@ public class VocabularyRecord
 
             this.callableProcedure.executeUpdate();
             this.con.commit();
-            this.logger.info(englishVocab + " in " + MainFrameView.getforeignLanguage() + " has been deleted from the database.");
+            this.logger.info(this.className, "deleteVocabulary(String)", englishVocab + " in " + MainFrameView.getforeignLanguage() + " has been deleted from the database.");
         }
         catch(final SQLException e)
         {
-            this.logger.error(e.toString(), e);
+            this.logger.error(this.className, "deleteVocabulary(String)", e.toString(), e);
         }
     }
     
@@ -108,14 +109,14 @@ public class VocabularyRecord
 
             this.callableProcedure.executeUpdate();
             this.con.commit();
-            this.logger.info(vocabObject.toString() + " has been update.");
+            this.logger.info(this.className, "updateVocabulary(Vocabulary, int)", vocabObject.toString() + " has been update.");
         }
         catch(final SQLException e)
         {
             final String[] newWord = vocabObject.getEnglishWord().split("/");
                     
             JOptionPane.showMessageDialog(null, newWord[newWord.length - 1] + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-            this.logger.error(e.toString(), e);
+            this.logger.error(this.className, "updateVocabulary(Vocabulary, int)", e.toString(), e);
         }
     }
     
@@ -153,7 +154,7 @@ public class VocabularyRecord
         }
         catch(final SQLException e)
         {
-            this.logger.error(e.toString(), e);
+            this.logger.error(this.className, "getVocabularies(String)", e.toString(), e);
         }
         
         return null;       
@@ -190,7 +191,7 @@ public class VocabularyRecord
         }
         catch (final SQLException ex)
         {
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "closeDB()", ex.toString(), ex);
         }
     }
 }

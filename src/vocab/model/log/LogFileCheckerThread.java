@@ -54,7 +54,7 @@ public class LogFileCheckerThread implements Runnable
                     } 
                     catch (final IOException | BadLocationException ex)
                     {
-                        logger.error(ex.toString(), ex);
+                        logger.error(this.getClass().getSimpleName(), "updateLogFrame()", ex.toString(), ex);
                     }
                 }
             });

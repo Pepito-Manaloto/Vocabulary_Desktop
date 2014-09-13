@@ -18,7 +18,8 @@ public final class CommandLineScript
     private String errorMessage;
     
     private final LogManager logger = LogManager.getInstance();
-    
+    private final String className = this.getClass().getSimpleName();
+
     /**
      * Class empty constructor.
      */
@@ -49,7 +50,7 @@ public final class CommandLineScript
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "execute(String...)", ex.toString(), ex);
         }
             
         return successful;
@@ -81,7 +82,7 @@ public final class CommandLineScript
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "execute(String, String)", ex.toString(), ex);
         }
 
         return successful;
@@ -113,7 +114,7 @@ public final class CommandLineScript
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "execute(String[], String)", ex.toString(), ex);
         }
             
         return successful;

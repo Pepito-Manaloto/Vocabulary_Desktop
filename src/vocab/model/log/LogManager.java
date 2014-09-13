@@ -18,19 +18,14 @@ import org.apache.logging.log4j.Logger;
 public final class LogManager
 {    
     private final Logger logger;
-    private final String className;
     private static final LogManager logManager = new LogManager();
     private final static AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
-    
+
     /**
      * Private constructor initializes log4j. 
      */
     private LogManager()
     {
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        
-        // Get the last class that calls LogManager
-        this.className = stacktrace[stacktrace.length - 1].getClassName();
         this.logger = org.apache.logging.log4j.LogManager.getLogger();
     }
     
@@ -62,73 +57,87 @@ public final class LogManager
     
     /**
      * Logs in debug level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      */
-    public void debug(final String message)
+    public void debug(final String className, final String methodName, final String message)
     {
-       this.logger.debug(this.className + " in " + this.getMethodName() + ": " + message);
+       this.logger.debug(className + " in " + methodName + ": " + message);
        updated.set(true);
     }
     
     /**
      * Logs in info level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      */
-    public void info(final String message)
+    public void info(final String className, final String methodName, final String message)
     {
-        this.logger.info(this.className + " in " + this.getMethodName() + ": " + message);
+        this.logger.info(className + " in " + methodName + ": " + message);
         updated.set(true);
     }
     
     /**
      * Logs in warn level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      */
-    public void warn(final String message)
+    public void warn(final String className, final String methodName, final String message)
     {
-        this.logger.warn(this.className + " in " + this.getMethodName() + ": " + message);
+        this.logger.warn(className + " in " + methodName + ": " + message);
         updated.set(true);
     }
     
     /**
      * Logs in error level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      */
-    public void error(final String message)
+    public void error(final String className, final String methodName, final String message)
     {
-        this.logger.error(this.className + " in " + this.getMethodName() + ": " + message);
+        this.logger.error(className + " in " + methodName + ": " + message);
         updated.set(true);
     }
     
     /**
      * Logs in error level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      * @param e exception stack trace
      */
-    public void error(final String message, final Throwable e)
+    public void error(final String className, final String methodName, final String message, final Throwable e)
     {
-        this.logger.error(this.className + " in " + this.getMethodName() + ": " + message, e);
+        this.logger.error(className + " in " + methodName + ": " + message, e);
         updated.set(true);
     }
 
     /**
      * Logs in fatal level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      */
-    public void fatal(final String message)
+    public void fatal(final String className, final String methodName, final String message)
     {
-        this.logger.fatal(this.className + " in " + this.getMethodName() + ": " + message);
+        this.logger.fatal(className + " in " + methodName + ": " + message);
         updated.set(true);
     }
 
     /**
      * Logs in fatal level.
+     * @param className name of the caller class
+     * @param methodName name of the caller method
      * @param message the log message
      * @param e exception stack trace
      */
-    public void fatal(final String message, final Throwable e)
+    public void fatal(final String className, final String methodName, final String message, final Throwable e)
     {
-        this.logger.fatal(this.className + " in " + this.getMethodName() + ": " + message, e);
+        this.logger.fatal(className + " in " + methodName + ": " + message, e);
         updated.set(true);
     }
 
@@ -157,25 +166,5 @@ public final class LogManager
         }
         
         return messageList;
-    }
-
-    /**
-     * Gets the method name of the current executing method.
-     * @return the method name
-     */
-    private String getMethodName()
-    {
-        final StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        
-        //Get the first method of the class calling getMethodName()
-        for(StackTraceElement stackElement: stacktrace)
-        {
-            if(this.className.equals(stackElement.getClassName()))
-            {
-                return stackElement.getMethodName();
-            }
-        }
-        
-        return null;
     }
 }

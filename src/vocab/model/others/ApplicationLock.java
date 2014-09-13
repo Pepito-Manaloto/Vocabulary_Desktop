@@ -23,7 +23,8 @@ public final class ApplicationLock
     private FileLock lock = null;   
     
     private final LogManager logger = LogManager.getInstance();
-    
+    private final String className = this.getClass().getSimpleName();
+
     /**
      * Ensures that only one application can run at a time. Uses FileLock technique.  
      * @param message the file name of the lock
@@ -46,7 +47,7 @@ public final class ApplicationLock
         }
         catch (final IOException ex)
         {
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "lockApplication(String)", ex.toString(), ex);
         }
         
     }
@@ -64,7 +65,7 @@ public final class ApplicationLock
         }
         catch (IOException ex)
         {
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.className, "releaseResources()", ex.toString(), ex);
         }
     }
 }

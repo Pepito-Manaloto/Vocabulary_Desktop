@@ -73,7 +73,7 @@ public class LogFrameController
         } 
         catch(final IOException | BadLocationException ex) 
         {
-            this.logger.error(ex.toString(), ex);
+            this.logger.error(this.getClass().getSimpleName(), "addListeners()", ex.toString(), ex);
         }
     }
     
@@ -122,7 +122,7 @@ public class LogFrameController
                 }
                 catch(final BadLocationException ex) 
                 {
-                    this.logger.error(ex.toString(), ex);
+                    this.logger.error(this.getClass().getSimpleName(), "actionPerformed(ActionEvent)", ex.toString(), ex);
                 }
             }
             else
@@ -133,7 +133,7 @@ public class LogFrameController
                 } 
                 catch(final IOException | BadLocationException ex) 
                 {
-                    this.logger.error(ex.toString(), ex);
+                    this.logger.error(this.getClass().getSimpleName(), "actionPerformed(ActionEvent)", ex.toString(), ex);
                 }
             }
         }   

@@ -57,7 +57,7 @@ public final class MySQLConnector
         catch (final IOException ex)
         {
             result = false;
-            logger.fatal(ex.toString(), ex);
+            logger.fatal(MySQLConnector.class.getSimpleName(), "setProperties()", ex.toString(), ex);
         }
         
         return result;
@@ -67,7 +67,7 @@ public final class MySQLConnector
      * Gets a connection from the database. Uses a hard coded username an password.
      * @return a MySQL JDBC connection
      */
-    public static Connection connect()  
+    public static Connection connect()
     {            
         Connection con = null;
 
@@ -78,7 +78,7 @@ public final class MySQLConnector
         catch(final SQLException ex)
         {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Note", JOptionPane.INFORMATION_MESSAGE);
-            logger.fatal(ex.toString(), ex);
+            logger.fatal(MySQLConnector.class.getSimpleName(), "connect()", ex.toString(), ex);
         }
 
         return con;
