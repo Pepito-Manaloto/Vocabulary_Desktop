@@ -54,7 +54,7 @@ BEGIN
       SELECT COUNT(*) FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = pForeign_language AND english_word LIKE CONCAT(letter, '%') INTO total;
       SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = pForeign_language AND english_word LIKE CONCAT(letter, '%');
     END IF;
-	
+
 END $$
 DELIMITER ;
 
@@ -70,6 +70,17 @@ BEGIN
     ELSE
       /* DO NOTHING */SELECT 1;
     END CASE;
-	
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `Get_Vocabularies`(IN pEnglish_word VARCHAR(70), IN pForeign_word VARCHAR(100) CHARSET utf8mb4, IN pForeign_language VARCHAR(30), IN word_language TINYINT)
+BEGIN
+
+    SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Hokkien"  ORDER BY english_word ASC;
+    SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Japanese"  ORDER BY english_word ASC;
+    SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Mandarin"  ORDER BY english_word ASC;
+
 END $$
 DELIMITER ;
