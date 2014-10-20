@@ -1,30 +1,30 @@
 <project name="Vocabulary" default="main" basedir=".">
     <description>Builds, tests, and runs the project Vocabulary.</description>
     
-	<!-- One Jar properties -->
+    <!-- One Jar properties -->
     <property name="one-jar.ant.jar" value="./one-jar-ant-task-0.97.jar"/>
     
     <!-- The entry point class in the output jar file -->
     <property name="main.class" value="vocab.main.Main"/>
-	
-	<property name="src.dir" value="../src"/> <!-- The directory that contains the source (java) files of the app -->
-	<property name="conf.dir" value="../conf"/> <!-- The directory that contains the config files of the app -->
-	<property name="tmp.dir" value="../tmp"/> <!-- The directory where the class files will be generated -->
-	<property name="bin.dir" value="../bin"/> <!-- The directory where the executable file will be generated -->
+    
+    <property name="src.dir" value="../src"/> <!-- The directory that contains the source (java) files of the app -->
+    <property name="conf.dir" value="../conf"/> <!-- The directory that contains the config files of the app -->
+    <property name="tmp.dir" value="../tmp"/> <!-- The directory where the class files will be generated -->
+    <property name="bin.dir" value="../bin"/> <!-- The directory where the executable file will be generated -->
     <property name="javadoc.dir" value="../${bin.dir}/javadoc"/> <!-- The directory where the javadoc files will be generated -->
-	
-	<target name="main" depends="clean, one.jar, javadoc"/>
-	
-	<path id="classpath">
+    
+    <target name="main" depends="clean, one.jar, javadoc"/>
+    
+    <path id="classpath">
         <fileset dir="../lib" includes="*.jar" />
     </path>
-	
-	<!-- Deletes the 'bin' directory -->
+    
+    <!-- Deletes the 'bin' directory -->
     <target name="clean">
         <delete dir="${tmp.dir}"/>
     </target>
-	
-	<!-- Compiles the source code -->
+    
+    <!-- Compiles the source code -->
     <target name="compile" depends="clean">
         <mkdir dir="${tmp.dir}"/>
         <copy todir="${tmp.dir}">
@@ -35,7 +35,7 @@
         </javac>
     </target>
 
-	<target name="rev.number">
+    <target name="rev.number">
         <!-- Running in Windows -->
         <exec executable="cmd" outputproperty="commit.count">
             <arg value = "/c" />
@@ -48,24 +48,24 @@
         <property name="app.version" value="${commit.count}-${sha1}"/>
     </target>
 
-	<!-- Archives compilied files along with dependencies -->
+    <!-- Archives compilied files along with dependencies -->
     <target name="one.jar" depends="compile, rev.number">
         <taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" classpath="${one-jar.ant.jar}" onerror="report"/>
 
-		<input message="Input application version: " addproperty="version" defaultvalue="1.0" />
-		<echo>Version: ${version}</echo>
+    <input message="Input application version: " addproperty="version" defaultvalue="1.0" />
+    <echo>Version: ${version}</echo>
 
-		<jar destfile="${tmp.dir}/main.jar" >
+    <jar destfile="${tmp.dir}/main.jar" >
             <fileset dir="${tmp.dir}"/>
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
-				<attribute name="Specification-Title" value="Vocabulary"/>
-				<attribute name="Specification-Version" value="${version}"/>
-				<attribute name="Implementation-Version" value="${app.version}"/>
-				<attribute name="Implementation-Vendor" value="Aaron John Asuncion"/>
+        <attribute name="Specification-Title" value="Vocabulary"/>
+        <attribute name="Specification-Version" value="${version}"/>
+        <attribute name="Implementation-Version" value="${app.version}"/>
+        <attribute name="Implementation-Vendor" value="Aaron John Asuncion"/>
             </manifest>
         </jar>
-		
+        
         <one-jar destfile="${bin.dir}/Vocabulary.jar">
             <main jar="${tmp.dir}/main.jar">
             </main>
@@ -75,13 +75,13 @@
                 </classpath>
             </lib>
         </one-jar>
-		
+        
         <fileset dir="${bin.dir}/conf"/>
         <copy file="${conf.dir}/vocabulary.conf" todir="${bin.dir}/conf"/>
         <copy file="${conf.dir}/log4j2.xml" todir="${bin.dir}/conf"/>
     </target>
-	
-	<!-- Creates the javadoc for the source code -->
+    
+    <!-- Creates the javadoc for the source code -->
     <target name="javadoc">
         <mkdir dir="${javadoc.dir}"/>
         <javadoc packagenames="vocab.*"
@@ -92,5 +92,5 @@
                encoding="UTF8" >
         </javadoc>
     </target>
-	
+
 </project>

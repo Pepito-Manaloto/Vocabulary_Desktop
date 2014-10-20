@@ -42,6 +42,7 @@ public final class Main
     static
     {
         // Set log4j2 async property
+        System.setProperty("log4j.configurationFile", "conf/log4j2.xml");
         System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
 

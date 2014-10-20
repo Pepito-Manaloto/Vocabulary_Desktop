@@ -5,7 +5,6 @@
 package vocab.view;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.io.IOException;

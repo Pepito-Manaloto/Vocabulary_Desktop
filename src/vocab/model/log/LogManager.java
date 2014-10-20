@@ -5,8 +5,9 @@
 package vocab.model.log;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +20,7 @@ public final class LogManager
 {    
     private final Logger logger;
     private static final LogManager logManager = new LogManager();
-    private final static AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
+    private static final AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
 
     /**
      * Private constructor initializes log4j. 
@@ -151,7 +152,7 @@ public final class LogManager
     {
         LinkedHashMap<String, LogLevel> messageList = new LinkedHashMap<>();
         
-        BufferedReader br = new BufferedReader(new FileReader(logPath));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(logPath), "UTF-8"));
         String line;
         
         while( (line = br.readLine()) != null) //Gets each message
