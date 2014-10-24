@@ -78,7 +78,7 @@ DELIMITER $$
 CREATE PROCEDURE `Get_Vocabularies`(IN pLast_updated DATETIME, OUT recently_added_count INT)
 BEGIN
 
-    SELECT COUNT(*) FROM vocabulary WHERE last_updated > pLast_updated INTO recently_added_count;
+    SELECT COUNT(*) FROM vocabulary WHERE last_updated > (pLast_updated  - INTERVAL 30 MINUTE) INTO recently_added_count;
     SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Hokkien"  ORDER BY english_word ASC;
     SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Japanese"  ORDER BY english_word ASC;
     SELECT english_word, foreign_word FROM vocabulary v, foreign_language f WHERE v.foreign_id = f.id AND f.language = "Mandarin"  ORDER BY english_word ASC;
