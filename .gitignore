@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -13,9 +12,6 @@ hs_err_pid*
 bin
 build
 logs
-nbproject
 tmp
 dist
-lib
-build.xml
 backup
