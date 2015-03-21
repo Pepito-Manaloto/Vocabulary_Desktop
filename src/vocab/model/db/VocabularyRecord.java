@@ -168,7 +168,7 @@ public class VocabularyRecord
     {       
         if(this.con == null || false == this.con.isValid(1))
         {
-            this.con = MySQLConnector.connect();
+            this.con = MySQLConnector.getConnection();
             this.con.setAutoCommit(false); 
         } 
     }
@@ -176,7 +176,7 @@ public class VocabularyRecord
     /**
      * Closes the connection
      */
-    public void closeDB()
+    public void closeConnection()
     {
         try
         {

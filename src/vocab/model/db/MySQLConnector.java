@@ -4,11 +4,12 @@
  */
 package vocab.model.db;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import java.beans.PropertyVetoException;
 import vocab.model.log.LogManager;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import javax.swing.JOptionPane;
@@ -24,24 +25,27 @@ public final class MySQLConnector
     private static String pw;    
     private static String url;
     private static String driver;
-    
-    private final static LogManager logger = LogManager.getInstance();
-    
-    private MySQLConnector(){};
-    
+
+    private static ComboPooledDataSource comboPooledDataSource;
+
+    public static final String TEST_QUERY = "SELECT 1";
+    private static final LogManager logger = LogManager.getInstance();
+
     static
     {
         setProperties();
+        initComboPooledDataSource();
     }
     
+    private MySQLConnector()
+    {}
+
     /**
      * Sets MySQL properties from the property file.
      * @return true on success, else false
      */
-    public static boolean setProperties()
+    private static boolean setProperties()
     {
-        boolean result;
-        
         try
         {
             Properties properties = new Properties();
@@ -51,29 +55,57 @@ public final class MySQLConnector
             pw = properties.getProperty(Config.DB_PASS.toString());
             url = properties.getProperty(Config.DB_URL.toString());
             driver = properties.getProperty(Config.DB_DRIVER.toString());
-
-            result = true; 
         }
-        catch (final IOException ex)
+        catch(final IOException ex)
         {
-            result = false;
             logger.fatal(MySQLConnector.class.getSimpleName(), "setProperties()", ex.toString(), ex);
+            return false;
         }
         
-        return result;
+        return true;
+    }
+
+    /**
+     * Initializes the C3P0 connection pool data source.
+     * @return true on success, else false
+     */
+    private static boolean initComboPooledDataSource()
+    {
+        try 
+        {
+            comboPooledDataSource = new ComboPooledDataSource();
+            comboPooledDataSource.setDriverClass(driver);
+            comboPooledDataSource.setJdbcUrl(url);
+            comboPooledDataSource.setUser(user);
+            comboPooledDataSource.setPassword(pw);
+            
+            //Optional params
+            comboPooledDataSource.setMinPoolSize(3);
+            comboPooledDataSource.setMaxPoolSize(20);
+            comboPooledDataSource.setTestConnectionOnCheckin(true);
+            comboPooledDataSource.setIdleConnectionTestPeriod(15);
+            comboPooledDataSource.setPreferredTestQuery(TEST_QUERY);
+        }
+        catch(final PropertyVetoException ex)
+        {
+            logger.fatal(MySQLConnector.class.getSimpleName(), "initComboPooledDataSource()", ex.toString(), ex);
+            return false;
+        }
+
+        return true;
     }
     
     /**
-     * Gets a connection from the database. Uses a hard coded username an password.
+     * Gets a connection from the database.
      * @return a MySQL JDBC connection
      */
-    public static Connection connect()
+    public static Connection getConnection()
     {            
         Connection con = null;
 
         try
         {
-            con = DriverManager.getConnection(url, user, pw);
+            con = comboPooledDataSource.getConnection();
         }
         catch(final SQLException ex)
         {
@@ -82,5 +114,13 @@ public final class MySQLConnector
         }
 
         return con;
+    }
+    
+    /**
+     * Closes the db pool connection.
+     */
+    public static void closeDB()
+    {
+        comboPooledDataSource.close();
     }
 }

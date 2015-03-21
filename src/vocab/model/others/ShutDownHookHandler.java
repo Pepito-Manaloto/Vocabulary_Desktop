@@ -4,6 +4,7 @@
  */
 package vocab.model.others;
 
+import vocab.model.db.MySQLConnector;
 import vocab.model.db.VocabularyRecord;
 
 /**
@@ -33,6 +34,7 @@ public final class ShutDownHookHandler extends Thread
     public void run()
     {
         this.appLock.releaseResources();
-        this.vRecord.closeDB();
+        this.vRecord.closeConnection();
+        MySQLConnector.closeDB();
     }
 }
