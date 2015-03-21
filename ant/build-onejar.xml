@@ -50,7 +50,7 @@
 
     <!-- Archives compilied files along with dependencies -->
     <target name="one.jar" depends="compile, rev.number">
-        <taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" classpath="${one-jar.ant.jar}" onerror="report"/>
+    <taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask" classpath="${one-jar.ant.jar}" onerror="report"/>
 
     <input message="Input application version: " addproperty="version" defaultvalue="1.0" />
     <echo>Version: ${version}</echo>
