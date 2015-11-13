@@ -1,5 +1,6 @@
 package com.aaron.desktop.main;
 
+import com.aaron.desktop.config.Config;
 import com.aaron.desktop.view.ViewManager;
 import java.awt.EventQueue;
 import java.util.HashMap;
@@ -19,7 +20,11 @@ import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Vendo
 import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Version;
 import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Title;
 import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Version;
+import com.aaron.desktop.model.others.Mailer;
 import com.aaron.desktop.model.others.Resource;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Main class of Main.
@@ -41,11 +46,25 @@ public final class Main
         Implementation_Vendor,
     }
 
+    private static final Properties properties;
+
     static
     {
         // Set log4j2 async property
         System.setProperty("log4j.configurationFile", Resource.LOG4J_CONFIG);
         System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+
+        try
+        {
+            properties = new Properties();
+            properties.load(new FileInputStream("conf/vocabulary.conf"));
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+            throw new ExceptionInInitializerError(ex);
+        }
+
     }
 
     /**
@@ -55,8 +74,10 @@ public final class Main
     public static void main(String[] args)
     {
         final VocabularyRecord vRecord = new VocabularyRecord();
+        final Mailer mailer = new Mailer(properties.getProperty(Config.EMAIL_SENDER.toString()),
+                                         properties.getProperty(Config.EMAIL_RECIPIENT.toString()));
         ApplicationLock appLock = new ApplicationLock();
-
+        
         appLock.lockApplication("Vocabulary is already running.");
         Runtime.getRuntime().addShutdownHook(new ShutDownHookHandler(appLock, vRecord));
 
@@ -73,11 +94,11 @@ public final class Main
                         ViewPanelController viewController = new ViewPanelController(viewPanel, vRecord);
 
                         MainFrameView mainView = new MainFrameView(addPanel, viewPanel);
-                        MainFrameController mainController = new MainFrameController(mainView, vRecord);
+                        MainFrameController mainController = new MainFrameController(mainView, vRecord, mailer);
 
                         addController.addListeners();
                         viewController.addListeners();
-                            mainController.addListeners();
+                        mainController.addListeners();
 
                         mainView.setLocationRelativeTo(null);
                         mainView.setVisible(true);

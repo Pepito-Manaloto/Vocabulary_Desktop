@@ -1,5 +1,6 @@
 package com.aaron.desktop.controller;
 
+import com.aaron.desktop.model.db.Vocabulary;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -27,6 +28,7 @@ import javax.swing.event.CaretListener;
 import com.aaron.desktop.model.db.VocabularyRecord;
 import com.aaron.desktop.model.log.LogManager;
 import com.aaron.desktop.model.others.CommandLineScript;
+import com.aaron.desktop.model.others.Mailer;
 import com.aaron.desktop.view.AboutFrameView;
 import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
@@ -46,11 +48,13 @@ public class MainFrameController
 {
     private final MainFrameView view;
     private final VocabularyRecord model;
-    
-    public MainFrameController(final MainFrameView view, final VocabularyRecord model)
+    private final Mailer mailer;
+
+    public MainFrameController(final MainFrameView view, final VocabularyRecord model, final Mailer mailer)
     {
         this.view = view;
         this.model = model;
+        this.mailer = mailer;
     }
     
     // adds event listener to all mainFrame's component.
@@ -73,10 +77,18 @@ public class MainFrameController
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    view.showPanel(View);
-                    view.getSearchTextField().setVisible(true); 
-                    view.getAddPanelView().clearTextfields();
-                    view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
+                    List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
+
+                    if(vocabList.isEmpty())
+                    {
+                        JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
+                        view.getSearchTextField().setVisible(true); 
+                        view.getAddPanelView().clearTextfields();
+                    }
                 }
             });
 
@@ -96,7 +108,7 @@ public class MainFrameController
 
         this.view.addSuggestionListListener(new SuggestionListListener(this.view));
         this.view.addSearchTextFieldListener(new SearchTextFieldListener(this.view));
-        this.view.addBackupButtonListener(new BackupListener(this.view));
+        this.view.addBackupButtonListener(new BackupListener(this.view, this.mailer));
         
         this.view.addAboutMenuItemListener(new ActionListener()
             {
@@ -158,7 +170,7 @@ public class MainFrameController
         {
             if(this.view.getSuggestionList().getSelectedValue() != null)
             {
-                this.view.getSearchTextField().setText(this.view.getSuggestionList().getSelectedValue().toString());
+                this.view.getSearchTextField().setText(this.view.getSuggestionList().getSelectedValue());
                 this.view.getSearchTextField().requestFocusInWindow();
             }              
         }
@@ -432,10 +444,12 @@ public class MainFrameController
     private static class BackupListener implements ActionListener
     {
         private final MainFrameView view;
+        private final Mailer mailer;
 
-        public BackupListener(final MainFrameView view)
+        public BackupListener(final MainFrameView view, final Mailer mailer)
         {
             this.view = view;
+            this.mailer = mailer;
         }
 
         /**
@@ -448,7 +462,8 @@ public class MainFrameController
             DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
             Calendar cal = Calendar.getInstance();
             String currentDate = dateFormat.format(cal.getTime());
-            String backupScript = "mysqldump --routines -uroot -proot --add-drop-database -B my_vocabulary -r \"my_vocabulary (" + currentDate + ").sql\"";
+            String fileName = "my_vocabulary (" + currentDate + ").sql";
+            String backupScript = "mysqldump --routines -uroot -proot --add-drop-database -B my_vocabulary -r \"" + fileName + "\"";
             String path = "./backup";
             File dir = new File(path);
 
@@ -460,6 +475,8 @@ public class MainFrameController
             CommandLineScript cmdScript = new CommandLineScript();
             boolean success = cmdScript.execute(backupScript, path);
 
+            int result = JOptionPane.showConfirmDialog(this.view, "Do you want to email the backup?", "Email Confirmation",
+                                                       JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if(success)
             {
                 JOptionPane.showMessageDialog(this.view, "Backup created successfully", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -467,6 +484,20 @@ public class MainFrameController
             else
             {
                 JOptionPane.showMessageDialog(this.view, cmdScript.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if(result == JOptionPane.YES_OPTION)
+            {
+                success = this.mailer.sendMail("Vocabulary backup " + currentDate, " ", path + "/" + fileName);
+                
+                if(success)
+                {
+                    JOptionPane.showMessageDialog(this.view, "Backup sent to mail", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }    
+                else
+                {
+                    JOptionPane.showMessageDialog(this.view, this.mailer.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }

@@ -13,7 +13,10 @@ public enum Config
     DB_URL("db.url"),
     DB_DRIVER("db.driver"),
     DB_USER("db.user"),
-    DB_PASS("db.pass");
+    DB_PASS("db.pass"),
+    EMAIL_SENDER("email.sender"),
+    EMAIL_RECIPIENT("email.recipient");
+    
 
     /** The value of the Config constant. */
     private final String value;

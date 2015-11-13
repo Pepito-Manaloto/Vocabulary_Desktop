@@ -4,7 +4,7 @@
 
     <groupId>com.aaron.desktop</groupId>
     <artifactId>Vocabulary</artifactId>
-    <version>6</version>
+    <version>7</version>
     <packaging>jar</packaging>
     <description>Desktop application that stores foreign vocabularies and their english translation.</description>
 
@@ -17,6 +17,7 @@
         <mysql.version>5.1.34</mysql.version>
         <log4j-api.version>2.1</log4j-api.version>
         <log4j-core.version>2.1</log4j-core.version>
+        <apache-commons-email.version>1.4</apache-commons-email.version>
 
         <hibernate-core.version>4.3.8.Final</hibernate-core.version>
         <hibernate-validator.version>4.3.2.Final</hibernate-validator.version>
@@ -50,6 +51,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j-core.version}</version>
+        </dependency>
+        <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-email</artifactId>
+                <version>${apache-commons-email.version}</version>
         </dependency>
 
         <dependency>

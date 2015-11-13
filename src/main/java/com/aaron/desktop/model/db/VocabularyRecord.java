@@ -8,6 +8,8 @@ import com.aaron.desktop.model.log.LogManager;
 import java.util.List;
 import javax.swing.JOptionPane;
 import com.aaron.desktop.view.MainFrameView;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.hibernate.Criteria;
 import org.hibernate.JDBCException;
 import org.hibernate.Query;
@@ -24,6 +26,7 @@ public class VocabularyRecord
 {
     private final LogManager logger = LogManager.getInstance();
     private final String className = this.getClass().getSimpleName();
+    public static final List<Vocabulary> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>(0));
 
     /**
      * adds a new vocabulary in the database and checks if it is successful.
@@ -34,7 +37,13 @@ public class VocabularyRecord
     {
         boolean success = true;
 
-        Session session = HibernateUtil.getInstance().openSession();
+        Session session = HibernateUtil.getInstance();
+
+        if(session == null)
+        {
+            return false;
+        }
+
         Transaction transaction = session.beginTransaction();
         try
         {      
@@ -64,7 +73,13 @@ public class VocabularyRecord
      */
     public void deleteVocabulary(final String selectedWord)
     {
-        Session session = HibernateUtil.getInstance().openSession();
+        Session session = HibernateUtil.getInstance();
+        
+        if(session == null)
+        {
+            return;
+        }
+
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("delete Vocabulary where english_word = :word");
 
@@ -93,7 +108,13 @@ public class VocabularyRecord
      */
     public void updateVocabulary(final Vocabulary vocabObject, final int column)
     {
-        Session session = HibernateUtil.getInstance().openSession();
+        Session session = HibernateUtil.getInstance();
+        
+        if(session == null)
+        {
+            return;
+        }
+
         Transaction transaction = session.beginTransaction();
 
         Query query;
@@ -141,7 +162,13 @@ public class VocabularyRecord
     */
     public List<Vocabulary> getVocabularies(final String letter)
     {      
-        Session session = HibernateUtil.getInstance().openSession();
+        Session session = HibernateUtil.getInstance();
+        
+        if(session == null)
+        {
+            return EMPTY_LIST;
+        }
+
         Criteria criteria = session.createCriteria(Vocabulary.class);
         criteria.add(Restrictions.eq("foreignId", MainFrameView.getforeignLanguage().getId()));
         try
@@ -171,7 +198,7 @@ public class VocabularyRecord
 
         return null;       
     }
-    
+
     /**
      * Closes the connection
      */

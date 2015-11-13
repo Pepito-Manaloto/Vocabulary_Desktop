@@ -35,7 +35,7 @@ public final class ApplicationLock
         {      
             this.lockFile = new File("appLock"); // creates new file named "appLock"
 
-            this.channel = new RandomAccessFile(lockFile, "rw").getChannel(); // get channel from the file
+            this.channel = new RandomAccessFile(this.lockFile, "rw").getChannel(); // get channel from the file
             this.lock = this.channel.tryLock(); // acquire lock from the file
 
             if(this.lock == null) // lock is null if it is already acquired before from the file

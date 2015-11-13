@@ -65,7 +65,7 @@ public final class MySQLConnector
     }
     
     /**
-     * Gets a connection from the database. Uses a hard coded username an password.
+     * Gets a connection from the database.
      * @return a MySQL JDBC connection
      */
     public static Connection connect()
