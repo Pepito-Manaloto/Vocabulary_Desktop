@@ -6,9 +6,7 @@
 
 package com.aaron.desktop.view;
 
-import java.util.Map;
 import com.aaron.desktop.main.Main;
-import com.aaron.desktop.main.Main.ManifestAttribute;
 import static com.aaron.desktop.main.Main.ManifestAttribute.*;
 
 /**
@@ -29,12 +27,10 @@ public final class AboutFrameView extends javax.swing.JFrame
 
     public void setLabels()
     {
-        Map<ManifestAttribute, String> map = Main.getApplicationInfo(Main.class);
-        
-        this.titleLabel.setText(map.get(Specification_Title));
-        this.authorLabel.setText(map.get(Implementation_Vendor));
-        this.versionLabel.setText(map.get(Specification_Version));
-        this.buildVersionLabel.setText(map.get(Implementation_Version));
+        this.titleLabel.setText(Main.getInfo(Specification_Title));
+        this.authorLabel.setText(Main.getInfo(Implementation_Vendor));
+        this.versionLabel.setText(Main.getInfo(Specification_Version));
+        this.buildVersionLabel.setText(Main.getInfo(Implementation_Version));
     }
 
     /**

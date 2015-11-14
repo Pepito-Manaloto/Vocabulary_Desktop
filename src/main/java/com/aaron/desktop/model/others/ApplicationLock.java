@@ -59,9 +59,20 @@ public final class ApplicationLock
     {
         try
         {
-            this.lock.release();
-            this.channel.close();
-            this.lockFile.delete();
+            if(this.lock != null && this.lock.isValid())
+            {
+                this.lock.release();
+            }
+
+            if(this.channel != null)
+            {
+                this.channel.close();
+            }
+
+            if(this.lockFile != null && this.lockFile.exists())
+            {
+                this.lockFile.delete();
+            }
         }
         catch (IOException ex)
         {

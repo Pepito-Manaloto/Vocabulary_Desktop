@@ -77,6 +77,9 @@ public class HibernateUtil
 
     public static void close()
     {
-        sessionFactory.close();
+        if(sessionFactory != null)
+        {
+            sessionFactory.close();
+        }
     }
 }

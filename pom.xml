@@ -123,6 +123,22 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Specification-Title>${project.artifactId}</Specification-Title>
+                            <Specification-Version>${project.version}</Specification-Version>
+                            <Implementation-Version></Implementation-Version>
+                            <Implementation-Vendor>Aaron John Asuncion</Implementation-Vendor>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.dstovall</groupId>
                 <artifactId>onejar-maven-plugin</artifactId>
                 <version>1.4.4</version>
@@ -155,7 +171,7 @@
                                 <copy todir="${basedir}/dist/conf">
                                     <fileset dir="${basedir}/conf" includes="**/*" />
                                 </copy>
-                          
+
                                 <copy file="${basedir}/target/${project.artifactId}.jar"
                                       tofile="${basedir}/dist/${project.artifactId}.jar" />
                             </target>

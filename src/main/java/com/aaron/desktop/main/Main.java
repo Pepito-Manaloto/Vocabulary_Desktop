@@ -3,9 +3,7 @@ package com.aaron.desktop.main;
 import com.aaron.desktop.config.Config;
 import com.aaron.desktop.view.ViewManager;
 import java.awt.EventQueue;
-import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import com.aaron.desktop.view.MainFrameView;
 import com.aaron.desktop.controller.AddPanelController;
 import com.aaron.desktop.controller.MainFrameController;
@@ -21,10 +19,9 @@ import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Versi
 import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Title;
 import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Version;
 import com.aaron.desktop.model.others.Mailer;
-import com.aaron.desktop.model.others.Resource;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map.Entry;
+import java.util.EnumMap;
 import java.util.Properties;
 
 /**
@@ -48,9 +45,39 @@ public final class Main
     }
 
     private static final Properties properties;
+    private static final Map<ManifestAttribute, String> APPLICATION_INFO_MAP;
 
     static
     {
+        APPLICATION_INFO_MAP = new EnumMap<>(ManifestAttribute.class);
+        // Navigate from its class object to a package object
+        Package objPackage = Main.class.getPackage();
+
+        String title = objPackage.getSpecificationTitle();
+        String version = objPackage.getSpecificationVersion();
+        String buildVersion = objPackage.getImplementationVersion();
+        String author = objPackage.getImplementationVendor();
+
+        if(title != null && !title.isEmpty())
+        {
+            APPLICATION_INFO_MAP.put(Specification_Title, title);
+        }
+
+        if(version != null && !version.isEmpty())
+        {
+            APPLICATION_INFO_MAP.put(Specification_Version, version);
+        }
+
+        if(buildVersion != null && !buildVersion.isEmpty())
+        {
+            APPLICATION_INFO_MAP.put(Implementation_Version, buildVersion);
+        }
+
+        if(author != null && !author.isEmpty())
+        {
+            APPLICATION_INFO_MAP.put(Implementation_Vendor, author);
+        }
+
         try
         {
             properties = new Properties();
@@ -113,31 +140,43 @@ public final class Main
     }
 
     /**
-     * Gets the application's information based on the manifest file.
-     * @param object class to check the application's information.
-     * @return the application's information in a Map
+     * Returns the manifest info about the application.
+     * @param attribute the manifest attribute to get
+     * @return String
      */
-    public static Map<ManifestAttribute, String> getApplicationInfo(final Class<? extends Main> object)
+    public static String getInfo(ManifestAttribute attribute)
     {
-        // Navigate from its class object to a package object
-        Package objPackage = object.getPackage();
+        String defaultValue;
 
-        String title = objPackage.getSpecificationTitle();
-        String version = objPackage.getSpecificationVersion();
-        String buildVersion = objPackage.getImplementationVersion();
-        String author = objPackage.getImplementationVendor();
-        
-        if(version == null || !version.matches("\\d+\\.?\\d*"))
+        switch(attribute)
         {
-            JOptionPane.showMessageDialog(null, "Invalid version in manifest.", "Message", JOptionPane.INFORMATION_MESSAGE);
+            case Specification_Title: 
+                defaultValue = "Vocabulary";
+                break;
+            case Specification_Version:
+                defaultValue = "7";
+                break;
+            case Specification_Vendor:
+                defaultValue = "Aaron";
+                break;
+            case Implementation_Title:
+                defaultValue = "Vocabulary";
+                break;
+            case Implementation_Version:
+                /*
+                git log --oneline | wc -l | gawk '{print $1}'
+                git rev-parse --short HEAD
+                git rev-parse --abbrev-ref HEAD
+                */
+                defaultValue = "25-0c3d8a3-hibernate";
+                break;
+            case Implementation_Vendor:
+                defaultValue = "Aaron";
+                break;
+            default:
+                defaultValue = "None";
+            
         }
-
-        Map<ManifestAttribute, String> map = new HashMap<>();
-        map.put(Specification_Title, title);
-        map.put(Specification_Version, version);
-        map.put(Implementation_Version, buildVersion);
-        map.put(Implementation_Vendor, author);
-
-        return map;
+        return APPLICATION_INFO_MAP.getOrDefault(attribute, defaultValue);
     }
 }

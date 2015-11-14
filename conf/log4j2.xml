@@ -6,7 +6,7 @@
      to make all loggers asynchronous.
 -->
      
-<Configuration>
+<Configuration shutdownHook="disable">
     <Appenders>
         <RandomAccessFile name="LOCAL" fileName="logs/vocabulary.log" append="true">
             <PatternLayout>
