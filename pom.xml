@@ -106,8 +106,22 @@
     </dependencies>
     
     <build>
-        <plugins>          
+        <plugins>
             <!-- Includes the runtime dependencies -->
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                  <filesets>
+                    <fileset>
+                      <directory>dist</directory>
+                      <followSymlinks>false</followSymlinks>
+                    </fileset>
+                  </filesets>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.dstovall</groupId>
                 <artifactId>onejar-maven-plugin</artifactId>
@@ -117,7 +131,7 @@
                         <phase>package</phase>
                         <configuration>
                             <mainClass>com.aaron.desktop.main.Main</mainClass>
-                            <filename>${project.artifactId}-${project.version}.jar</filename>
+                            <filename>${project.artifactId}.jar</filename>
                         </configuration>
                         <goals>
                             <goal>one-jar</goal>
@@ -141,9 +155,9 @@
                                 <copy todir="${basedir}/dist/conf">
                                     <fileset dir="${basedir}/conf" includes="**/*" />
                                 </copy>
-                                <copy todir="${basedir}/dist">
-                                    <fileset dir="${basedir}/target" includes="${project.artifactId}-${project.version}.jar" />
-                                </copy>
+                          
+                                <copy file="${basedir}/target/${project.artifactId}.jar"
+                                      tofile="${basedir}/dist/${project.artifactId}.jar" />
                             </target>
                         </configuration>
                         <goals>
@@ -152,6 +166,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

@@ -196,7 +196,7 @@ public class VocabularyRecord
             session.close();
         }
 
-        return null;       
+        return EMPTY_LIST;
     }
 
     /**

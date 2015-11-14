@@ -15,7 +15,8 @@ public enum Config
     DB_USER("db.user"),
     DB_PASS("db.pass"),
     EMAIL_SENDER("email.sender"),
-    EMAIL_RECIPIENT("email.recipient");
+    EMAIL_RECIPIENT("email.recipient"),
+    LOG4J_CONF("log4j.conf");
     
 
     /** The value of the Config constant. */

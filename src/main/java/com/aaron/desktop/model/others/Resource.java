@@ -15,8 +15,7 @@ public class Resource
     public static final String IMAGE_ICON = "/com/aaron/desktop/images/icon.png";
     public static final String IMAGE_SEARCH_ICON = "/com/aaron/desktop/images/search_icon.png";
     public static final String HIBERNATE_CONFIG = "/com/aaron/desktop/hibernate/hibernate.cfg.xml";
-    public static final String LOG4J_CONFIG = "conf/log4j2.xml";
-    
+
     private Resource()
     {}
 }

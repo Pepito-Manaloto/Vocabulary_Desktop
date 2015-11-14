@@ -24,6 +24,7 @@ import com.aaron.desktop.model.others.Mailer;
 import com.aaron.desktop.model.others.Resource;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -50,14 +51,15 @@ public final class Main
 
     static
     {
-        // Set log4j2 async property
-        System.setProperty("log4j.configurationFile", Resource.LOG4J_CONFIG);
-        System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-
         try
         {
             properties = new Properties();
             properties.load(new FileInputStream("conf/vocabulary.conf"));
+
+            properties.entrySet().stream().forEach((entry) ->
+            {
+                System.out.println(entry.getKey() + " = " + entry.getValue());
+            });
         }
         catch (IOException ex)
         {
@@ -73,6 +75,10 @@ public final class Main
      */
     public static void main(String[] args)
     {
+        // Set log4j2 async property
+        System.setProperty("log4j.configurationFile", properties.getProperty(Config.LOG4J_CONF.toString()));
+        System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+
         final VocabularyRecord vRecord = new VocabularyRecord();
         final Mailer mailer = new Mailer(properties.getProperty(Config.EMAIL_SENDER.toString()),
                                          properties.getProperty(Config.EMAIL_RECIPIENT.toString()));
