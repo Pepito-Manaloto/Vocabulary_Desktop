@@ -118,11 +118,13 @@ public final class ViewPanelView extends javax.swing.JPanel {
     {
         this.table.getDataVector().removeAllElements(); // Clears the table
 
-        for (Vocabulary v : vocabularyList) // Fills the table
-        {
-            this.table.addRow(v.getVocabularyAsObject());
-        }
-        
+        vocabularyList.stream().forEach(
+           (Vocabulary v) ->
+            {
+                // Fills the table
+                this.table.addRow(v.getVocabularyAsObject());
+            }); 
+
         if(Hokkien.equals(MainFrameView.getforeignLanguage()))
         {
             this.vocabularyTable.setFont(ViewManager.MEIRYO14);

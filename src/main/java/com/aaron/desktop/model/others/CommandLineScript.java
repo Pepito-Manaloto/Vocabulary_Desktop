@@ -46,7 +46,7 @@ public final class CommandLineScript
                 successful = true;
             }                    
         }
-        catch (final IOException | InterruptedException ex)
+        catch(final IOException | InterruptedException ex)
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;
@@ -78,7 +78,7 @@ public final class CommandLineScript
                 successful = true;
             }                    
         }
-        catch (final IOException | InterruptedException ex)
+        catch(final IOException | InterruptedException ex)
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;
@@ -110,7 +110,7 @@ public final class CommandLineScript
                 successful = true;
             }                    
         }
-        catch (final IOException | InterruptedException ex)
+        catch(final IOException | InterruptedException ex)
         {
             successful = false;
             this.errorMessage = ex.toString() + " error code=" + result;

@@ -7,7 +7,6 @@
 package com.aaron.desktop.controller;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
@@ -38,13 +37,10 @@ public class ViewPanelController
      */
     public void addListeners() 
     {
-        this.view.addLetterComboBoxListener(new ActionListener()
+        this.view.addLetterComboBoxListener(
+            (ActionEvent e) ->
             {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
-                }
+                view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
             });
 
         this.view.addVocabularyTableListener(new TableChangeListener(this.view, this.model), new TableKeyListener(this.view, this.model));
@@ -83,6 +79,10 @@ public class ViewPanelController
                 {
                     this.model.updateVocabulary(new Vocabulary(wordEnglish, wordForeign, MainFrameView.getforeignLanguage()),
                                                 e.getColumn());
+                }
+                else
+                {
+                    this.view.refreshTable(this.model.getVocabularies(this.view.getLetterComboBoxItem()));
                 }
             }
         }

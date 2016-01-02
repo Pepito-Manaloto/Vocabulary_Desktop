@@ -45,7 +45,7 @@ public final class ApplicationLock
             }
             
         }
-        catch (final IOException ex)
+        catch(final IOException ex)
         {
             this.logger.error(this.className, "lockApplication(String)", ex.toString(), ex);
         }
@@ -74,7 +74,7 @@ public final class ApplicationLock
                 this.lockFile.delete();
             }
         }
-        catch (IOException ex)
+        catch(IOException ex)
         {
             this.logger.error(this.className, "releaseResources()", ex.toString(), ex);
         }

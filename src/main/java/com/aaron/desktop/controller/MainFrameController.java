@@ -60,80 +60,65 @@ public class MainFrameController
     // adds event listener to all mainFrame's component.
     public void addListeners()
     {   
-        this.view.addAddButtonListener(new ActionListener()    
+        this.view.addAddButtonListener(
+            (ActionEvent e) ->
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    view.showPanel(Add);
-                    view.getSearchTextField().setVisible(false); 
-                    view.getSearchTextField().setText("");
-                    view.getSuggestListScrollPane().setVisible(false); 
-                }
+                view.showPanel(Add);
+                view.getSearchTextField().setVisible(false);
+                view.getSearchTextField().setText("");
+                view.getSuggestListScrollPane().setVisible(false);
             });
         
-        this.view.addViewButtonListener(new ActionListener()    
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
+        this.view.addViewButtonListener(
+            (ActionEvent e) ->
+            {    
+                List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
 
-                    if(vocabList.isEmpty())
-                    {
-                        JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                    else
-                    {
-                        view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
-                        view.getSearchTextField().setVisible(true); 
-                        view.getAddPanelView().clearTextfields();
-                    }
+                if(vocabList.isEmpty())
+                {
+                    JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                {
+                    view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
+                    view.getSearchTextField().setVisible(true);
+                    view.getAddPanelView().clearTextfields();
                 }
             });
 
-        this.view.addForeignLanguageComboBoxListener(new ActionListener()
+        this.view.addForeignLanguageComboBoxListener(
+            (ActionEvent e) ->
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
-    
-                    view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
+                view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
 
-                    MainFrameView.setForeignLanguage(view.getForeignLanguageComboBoxItem());
-                    view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
-                }
+                view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
+
+                MainFrameView.setForeignLanguage(view.getForeignLanguageComboBoxItem());
+                view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
             });  
 
         this.view.addSuggestionListListener(new SuggestionListListener(this.view));
         this.view.addSearchTextFieldListener(new SearchTextFieldListener(this.view));
         this.view.addBackupButtonListener(new BackupListener(this.view, this.mailer));
         
-        this.view.addAboutMenuItemListener(new ActionListener()
+        this.view.addAboutMenuItemListener(
+            (ActionEvent e) ->
             {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    AboutFrameView aboutFrame = new AboutFrameView();
-                    aboutFrame.setLocationRelativeTo(view);
-                    aboutFrame.setVisible(true);
-                }
+                AboutFrameView aboutFrame = new AboutFrameView();
+                aboutFrame.setLocationRelativeTo(view);
+                aboutFrame.setVisible(true);
             });
         
-        this.view.addShowLogsMenuItemListener(new ActionListener()
+        this.view.addShowLogsMenuItemListener(
+            (ActionEvent e) ->
             {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    LogFrameView logFrame = new LogFrameView();
-                    LogManager logger = LogManager.getInstance();
-                    LogFrameController logFrameController = new LogFrameController(logFrame, logger);
-                    
-                    logFrameController.addListeners();
-                    logFrame.setLocationRelativeTo(view);
-                    logFrame.setVisible(true);
-                }
+                LogFrameView logFrame = new LogFrameView();
+                LogManager logger = LogManager.getInstance();
+                LogFrameController logFrameController = new LogFrameController(logFrame, logger);
+
+                logFrameController.addListeners();
+                logFrame.setLocationRelativeTo(view);
+                logFrame.setVisible(true);
             });
     }
     
@@ -219,23 +204,23 @@ public class MainFrameController
                 this.suggestListScrollPane.setVisible(true); 
 
                 List<List<?>> suggestionsAndSearchedWordList = this.getSuggestionsAndSearchedWord(searchedWord);
-                List<?> suggestionsList = suggestionsAndSearchedWordList.get(0);
+                List<String> suggestionsList = (List<String>) suggestionsAndSearchedWordList.get(0);
                 String[] suggestionsArray = suggestionsList.toArray(new String[suggestionsList.size()]);
 
                 this.suggestionList.setListData(suggestionsArray); // fills the suggestion box
 
-                List<?> searchedWordList = suggestionsAndSearchedWordList.get(1);
+                List<Integer> searchedWordList = (List<Integer>) suggestionsAndSearchedWordList.get(1);
                 
                 if(searchedWordList.isEmpty() == false)
                 {
-                    this.vocabularyTable.changeSelection((Integer)searchedWordList.get(0), 0, false, false); 
+                    this.vocabularyTable.changeSelection(searchedWordList.get(0), 0, false, false); 
                 }
 
                 // Used by keylistener "enter", for multiple identical search word results.
                 this.searchWordIndex = new int[searchedWordList.size()];
                 for(int i = 0; i < this.searchWordIndex.length; i++)
                 {
-                    this.searchWordIndex[i] = (Integer)searchedWordList.get(i);
+                    this.searchWordIndex[i] = searchedWordList.get(i);
                 }
 
                 this.updateSuggestionListHeight(searchedWord);
@@ -314,11 +299,11 @@ public class MainFrameController
         private void updateSuggestionListHeight(final String searchedWord)
         {
             // only one suggested text left and a row is selected.
-            if(this.suggestionList.getModel().getSize() <= 0 &&
+            if(this.suggestionList.getModel().getSize() <= 1 &&
                this.vocabularyTable.getSelectedRow() >= 1)
             {
                 this.suggestListScrollPane.setVisible(false);
-            } 
+            }
             else // automatically change suggestion list height depending on number of data.
             {
                 int listHeight = (this.suggestionList.getModel().getSize()) * SUGGESTION_LIST_ROW_HEIGHT; // 22 is the height of each row
@@ -328,7 +313,7 @@ public class MainFrameController
                     listHeight += 17; // add height for scroll bar
                 }
 
-                if(listHeight > 143)   
+                if(listHeight > 143)
                 {
                     this.suggestListScrollPane.setSize(170, 143); // default 7 rows
                 }
@@ -357,70 +342,77 @@ public class MainFrameController
             int keycode = e.getKeyCode();
             int selectedIndex = this.suggestionList.getSelectedIndex();
 
-            if(keycode == KeyEvent.VK_BACK_SPACE)
+            switch(keycode)
             {
-                this.updateSuggestionListHeight(this.searchTextField.getText());
-            }
-            else if(keycode == KeyEvent.VK_UP)
-            {                     
-                if( selectedIndex > -1 ) // there is a selected word in the list.
+                case KeyEvent.VK_BACK_SPACE:
                 {
-                    if( selectedIndex  == 0 ) //if at the beginning of the list, move back to end.  
+                    this.updateSuggestionListHeight(this.searchTextField.getText());
+                    break;
+                }
+                case KeyEvent.VK_UP:
+                {
+                    if( selectedIndex > -1 ) // there is a selected word in the list.
+                    {
+                        if( selectedIndex  == 0 ) //if at the beginning of the list, move back to end.
+                        {
+                            this.suggestionList.setSelectedIndex(this.suggestionList.getModel().getSize() - 1);               
+                            this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1);
+                        }
+                        else
+                        {
+                            this.suggestionList.setSelectedIndex(selectedIndex - 1);
+                            this.suggestionList.ensureIndexIsVisible(selectedIndex - 1);
+                        }
+                    }
+                    else
                     {
                         this.suggestionList.setSelectedIndex(this.suggestionList.getModel().getSize() - 1);
-                        this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1); 
-                    }               
-                    else
-                    {
-                        this.suggestionList.setSelectedIndex(selectedIndex - 1);
-                        this.suggestionList.ensureIndexIsVisible(selectedIndex - 1); 
-                    }             
+                        this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1);
+                    }
+                    break;
                 }
-                else
+                case KeyEvent.VK_DOWN:
                 {
-                    this.suggestionList.setSelectedIndex(this.suggestionList.getModel().getSize() - 1);
-                    this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1); 
-                } 
-
-            }
-            else if(keycode == KeyEvent.VK_DOWN)
-            {
-                if( selectedIndex > -1 ) // there is a selected word in the list.
-                {
-                    if( selectedIndex  == this.suggestionList.getModel().getSize() - 1 ) //if at the end of the list, move back to beginning.
+                    if( selectedIndex > -1 ) // there is a selected word in the list.
+                    {
+                        if( selectedIndex  == this.suggestionList.getModel().getSize() - 1 ) //if at the end of the list, move back to beginning.
+                        {
+                            this.suggestionList.setSelectedIndex(0); 
+                            this.suggestionList.ensureIndexIsVisible(0);
+                        }
+                        else
+                        {
+                            this.suggestionList.setSelectedIndex(selectedIndex + 1);
+                            this.suggestionList.ensureIndexIsVisible(selectedIndex + 1);
+                        }
+                    }
+                    else
                     {
                         this.suggestionList.setSelectedIndex(0);
-                        this.suggestionList.ensureIndexIsVisible(0); 
-                    } 
-                    else
+                        this.suggestionList.ensureIndexIsVisible(0);
+                    }
+                    break;
+                }
+                case KeyEvent.VK_ENTER:
+                {
+                    if(this.suggestionList.getSelectedValue() != null)
                     {
-                        this.suggestionList.setSelectedIndex(selectedIndex + 1);
-                        this.suggestionList.ensureIndexIsVisible(selectedIndex + 1); 
-                    } 
+                        this.searchTextField.setText(this.suggestionList.getSelectedValue());
+                    }
+                    /* 
+                      Adds one to the counter to get to the next matched identical searched word.
+                      Modulo the counter to the length of the searchedWord array to reset the counter and prevent indexOutOfBoundsException.
+                    */
+                    if(this.searchWordIndex != null && this.searchWordIndex.length > 0)
+                    {
+                        this.searchWordCounter = (searchWordCounter + 1) % this.searchWordIndex.length;
+                        this.vocabularyTable.changeSelection(this.searchWordIndex[searchWordCounter], 0, false, false);
+                    }
+                    break;
                 }
-                else
-                {
-                    this.suggestionList.setSelectedIndex(0);
-                    this.suggestionList.ensureIndexIsVisible(0); 
-                }
+                default:
+                    // Do nothing
             }
-            else if(keycode == KeyEvent.VK_ENTER)
-            {
-                if(this.suggestionList.getSelectedValue() != null)
-                {
-                    this.searchTextField.setText(this.suggestionList.getSelectedValue().toString());
-                } 
-
-                /* 
-                Adds one to the counter to get to the next matched identical searched word.
-                Modulo the counter to the length of the searchedWord array to reset the counter and prevent indexOutOfBoundsException.
-                */
-                if(this.searchWordIndex != null && this.searchWordIndex.length > 0)
-                {                              
-                    this.searchWordCounter = (searchWordCounter + 1) % this.searchWordIndex.length;
-                    this.vocabularyTable.changeSelection( this.searchWordIndex[searchWordCounter], 0, false, false); 
-                }
-            } 
         }
 
         @Override
@@ -432,7 +424,7 @@ public class MainFrameController
           @param e focus event
         */
         @Override
-        public void focusLost(final FocusEvent e)
+        public void focusLost(FocusEvent e)
         {
             this.suggestListScrollPane.setVisible(false);
         }

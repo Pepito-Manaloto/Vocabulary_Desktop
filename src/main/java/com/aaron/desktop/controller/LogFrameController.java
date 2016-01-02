@@ -110,13 +110,12 @@ public class LogFrameController
                 {
                     LinkedHashMap<String, LogLevel> filteredLogMessages = new LinkedHashMap<>();
 
-                    for(String message: this.logFrame.getLogMessages().keySet())
-                    {
-                        if(message.contains(searchString))
-                        {
-                            filteredLogMessages.put(message, this.logFrame.getLogMessages().get(message));
-                        }
-                    }
+                    this.logFrame.getLogMessages().keySet().stream().filter(
+                        (String message) -> message.contains(searchString)).forEach(
+                            (String message) ->
+                            {
+                                filteredLogMessages.put(message, this.logFrame.getLogMessages().get(message));
+                            }); 
 
                     this.logFrame.fillLog(filteredLogMessages);
                 }

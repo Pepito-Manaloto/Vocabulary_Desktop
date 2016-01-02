@@ -71,7 +71,7 @@ public class Mailer
 
             email.send();
         }
-        catch (final EmailException ex)
+        catch(final EmailException ex)
         {
             ex.printStackTrace();
             logger.error(this.className, "sendMail(String, String, String...)", ex.toString(), ex);
