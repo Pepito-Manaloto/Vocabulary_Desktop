@@ -19,12 +19,6 @@ public final class CommandLineScript
     
     private final LogManager logger = LogManager.getInstance();
     private final String className = this.getClass().getSimpleName();
-
-    /**
-     * Class empty constructor.
-     */
-    public CommandLineScript()
-    {}
     
     /**
      * Executes the given array of scripts.

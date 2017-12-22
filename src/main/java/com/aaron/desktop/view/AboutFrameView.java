@@ -7,7 +7,6 @@
 package com.aaron.desktop.view;
 
 import com.aaron.desktop.main.Main;
-import static com.aaron.desktop.main.Main.ManifestAttribute.*;
 
 /**
  *

@@ -32,7 +32,6 @@ import com.aaron.desktop.model.others.Mailer;
 import com.aaron.desktop.view.AboutFrameView;
 import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
-import static com.aaron.desktop.view.MainFrameView.PanelName.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -211,7 +210,7 @@ public class MainFrameController
 
                 List<Integer> searchedWordList = (List<Integer>) suggestionsAndSearchedWordList.get(1);
                 
-                if(searchedWordList.isEmpty() == false)
+                if(searchedWordList.isEmpty())
                 {
                     this.vocabularyTable.changeSelection(searchedWordList.get(0), 0, false, false); 
                 }
@@ -258,7 +257,7 @@ public class MainFrameController
 
             for(int i = 0; i < numOfRows; i++)
             {
-                if(keyWord.equals("")) 
+                if(keyWord.isEmpty()) 
                 {
                     break;
                 }
@@ -417,7 +416,9 @@ public class MainFrameController
 
         @Override
         public void focusGained(FocusEvent e)
-        {}
+        {
+            // No action
+        }
               
         /**
           Action event for search textfield. Hides suggestion list if not focused on textfield.

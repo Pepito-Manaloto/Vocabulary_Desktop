@@ -111,6 +111,9 @@ public class LogFrameView extends javax.swing.JFrame
                     break;    
                 case FATAL:
                     StyleConstants.setForeground(style, DARK_RED);
+                    break;
+                default:
+                    StyleConstants.setForeground(style, Color.BLACK);
             }
 
             this.document.insertString(this.document.getLength(), message + "\n", style);
