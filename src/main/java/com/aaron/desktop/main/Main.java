@@ -114,29 +114,24 @@ public final class Main
         appLock.lockApplication("Vocabulary is already running.");
         Runtime.getRuntime().addShutdownHook(new ShutDownHookHandler(appLock, vRecord));
 
-        EventQueue.invokeLater(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        ViewManager.init();
-
-                        AddPanelView addPanel = new AddPanelView();  
-                        ViewPanelView viewPanel = new ViewPanelView();
-                        AddPanelController addController = new AddPanelController(addPanel, vRecord);
-                        ViewPanelController viewController = new ViewPanelController(viewPanel, vRecord);
-
-                        MainFrameView mainView = new MainFrameView(addPanel, viewPanel);
-                        MainFrameController mainController = new MainFrameController(mainView, vRecord, mailer);
-
-                        addController.addListeners();
-                        viewController.addListeners();
-                        mainController.addListeners();
-
-                        mainView.setLocationRelativeTo(null);
-                        mainView.setVisible(true);
-                    }
-                });
+        EventQueue.invokeLater(() -> {
+            ViewManager.init();
+            
+            AddPanelView addPanel = new AddPanelView();
+            ViewPanelView viewPanel = new ViewPanelView();
+            AddPanelController addController = new AddPanelController(addPanel, vRecord);
+            ViewPanelController viewController = new ViewPanelController(viewPanel, vRecord);
+            
+            MainFrameView mainView = new MainFrameView(addPanel, viewPanel);
+            MainFrameController mainController = new MainFrameController(mainView, vRecord, mailer);
+            
+            addController.addListeners();
+            viewController.addListeners();
+            mainController.addListeners();
+            
+            mainView.setLocationRelativeTo(null);
+            mainView.setVisible(true);
+        });
     }
 
     /**
