@@ -123,12 +123,29 @@
             </plugin>
 
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+                        
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
                     <archive>
+                        <index>false</index>
+                        <manifest>
+                                <mainClass>com.aaron.desktop.main.Main</mainClass>
+                                <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addClasspath>false</addClasspath>
+                        </manifest>
                         <manifestEntries>
+                            <Class-Path>conf/</Class-Path>
                             <Specification-Title>${project.artifactId}</Specification-Title>
                             <Specification-Version>${project.version}</Specification-Version>
                             <Implementation-Version></Implementation-Version>
@@ -137,21 +154,39 @@
                     </archive>
                 </configuration>
             </plugin>
-
+            
             <plugin>
-                <groupId>org.dstovall</groupId>
-                <artifactId>onejar-maven-plugin</artifactId>
-                <version>1.4.4</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <configuration>
-                            <mainClass>com.aaron.desktop.main.Main</mainClass>
-                            <filename>${project.artifactId}.jar</filename>
-                        </configuration>
                         <goals>
-                            <goal>one-jar</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <finalName>${project.artifactId}</finalName>
+                            <artifactSet>
+                                <excludes>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -185,12 +220,4 @@
 
         </plugins>
     </build>
-
-    <!-- One-Jar is in the googlecode repository -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-    </pluginRepositories>
 </project>

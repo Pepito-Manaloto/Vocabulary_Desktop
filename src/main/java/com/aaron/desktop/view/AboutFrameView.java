@@ -7,6 +7,10 @@
 package com.aaron.desktop.view;
 
 import com.aaron.desktop.main.Main;
+import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Vendor;
+import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Version;
+import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Title;
+import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Version;
 
 /**
  *

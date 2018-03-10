@@ -32,6 +32,8 @@ import com.aaron.desktop.model.others.Mailer;
 import com.aaron.desktop.view.AboutFrameView;
 import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
+import static com.aaron.desktop.view.MainFrameView.PanelName.Add;
+import static com.aaron.desktop.view.MainFrameView.PanelName.View;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
