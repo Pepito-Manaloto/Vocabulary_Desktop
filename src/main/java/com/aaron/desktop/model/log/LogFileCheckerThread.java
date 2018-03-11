@@ -33,30 +33,23 @@ public class LogFileCheckerThread implements Runnable
     {
         if(LogManager.isUpdated())
         {
-            this.updateLogFrame();
+            EventQueue.invokeLater(this::updateLogFrame);
             LogManager.finishedUpdating();
         }
     }
-    
+
     /**
      * Updates the log frame's content.
      */
     private void updateLogFrame()
     {
-        EventQueue.invokeLater(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try 
-                    {
-                        logFrame.init(logger.getMessageLogFromFile("logs/vocabulary.log"));
-                    } 
-                    catch (final IOException | BadLocationException ex)
-                    {
-                        logger.error(this.getClass().getSimpleName(), "updateLogFrame()", ex.toString(), ex);
-                    }
-                }
-            });
+        try 
+        {
+            logFrame.init(logger.getMessageLogFromFile());
+        } 
+        catch (IOException | BadLocationException ex)
+        {
+            logger.error(this.getClass().getSimpleName(), "updateLogFrame()", ex.toString(), ex);
+        }
     }
 }

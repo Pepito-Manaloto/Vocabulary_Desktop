@@ -48,7 +48,7 @@ public final class MainFrameView extends javax.swing.JFrame
     private final ViewPanelView view;
     private final AddPanelView add;
     private JTextField searchTextField;
-    private static String selectedForeignLanguage = "Hokkien";
+    private static ForeignLanguage selectedForeignLanguage = ForeignLanguage.Hokkien;
 
     /**
      * Sets up the background image, Layout, and actionListeners.
@@ -62,7 +62,7 @@ public final class MainFrameView extends javax.swing.JFrame
         this.initComponents();
         this.setSize(891,561);
 
-        setForeignLanguage(Hokkien.toString());
+        setForeignLanguage(Hokkien);
 
         this.cardLayout = new CardLayout();
         this.setIconImage(new ImageIcon(getClass().getResource(Resource.IMAGE_ICON)).getImage());
@@ -224,24 +224,14 @@ public final class MainFrameView extends javax.swing.JFrame
      */
     public static ForeignLanguage getforeignLanguage()
     {
-        switch(selectedForeignLanguage)
-        {
-            case "Hokkien": 
-                return Hokkien;
-            case "Japanese":
-                return Japanese;
-            case "Mandarin":
-                return Mandarin;
-            default:
-                throw new AssertionError("Unsupported foreign language.");
-        }
+        return selectedForeignLanguage;
     }
 
     /**
      * Sets the foreign language.
      * @param foreignLanguage the language to set.
      */
-    public static void setForeignLanguage(final String foreignLanguage)
+    public static void setForeignLanguage(final ForeignLanguage foreignLanguage)
     {
         selectedForeignLanguage = foreignLanguage;
     }

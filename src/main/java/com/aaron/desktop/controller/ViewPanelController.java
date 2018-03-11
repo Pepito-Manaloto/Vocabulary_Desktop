@@ -6,7 +6,6 @@
 
 package com.aaron.desktop.controller;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
@@ -16,6 +15,7 @@ import com.aaron.desktop.model.db.Vocabulary;
 import com.aaron.desktop.model.db.VocabularyRecord;
 import com.aaron.desktop.view.MainFrameView;
 import com.aaron.desktop.view.ViewPanelView;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -37,12 +37,8 @@ public class ViewPanelController
      */
     public void addListeners() 
     {
-        this.view.addLetterComboBoxListener(
-            (ActionEvent e) ->
-            {
-                view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
-            });
-
+        ActionListener comboBoxListener = (e) -> view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
+        this.view.addLetterComboBoxListener(comboBoxListener);
         this.view.addVocabularyTableListener(new TableChangeListener(this.view, this.model), new TableKeyListener(this.view, this.model));
     }
     
@@ -68,7 +64,8 @@ public class ViewPanelController
         @Override
         public void tableChanged(final TableModelEvent e)
         {
-            if (e.getLastRow() >= 0 && e.getType() == 0) // Cell Updated
+            boolean isCellUpdated = e.getLastRow() >= 0 && e.getType() == 0;
+            if (isCellUpdated)
             {
                 String wordEnglish = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 0).toString();
                 String wordForeign = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 1).toString();
@@ -110,7 +107,8 @@ public class ViewPanelController
         @Override
         public void keyPressed(final KeyEvent e) 
         {
-            if (this.delete(e)) 
+            boolean isDelete = view.getVocabularyTable().getSelectedRow() >= 0 && e.getKeyCode() == KeyEvent.VK_DELETE;
+            if (isDelete) 
             {
                 String selectedWord = this.view.getDefaultTableModel().getValueAt(this.view.getVocabularyTable().getSelectedRow(), 0).toString();
 
@@ -123,16 +121,6 @@ public class ViewPanelController
                     this.view.getDefaultTableModel().removeRow(this.view.getVocabularyTable().getSelectedRow());
                 }
             }
-        }
-
-        /**
-         * Checks if there is a row selected and if delete key is pressed.
-         *
-         * @param e key event
-         */
-        private boolean delete(final KeyEvent e)
-        {
-            return this.view.getVocabularyTable().getSelectedRow() >= 0 && e.getKeyCode() == KeyEvent.VK_DELETE;
         }
     }
 }

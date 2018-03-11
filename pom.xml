@@ -17,6 +17,7 @@
         <mysql.version>5.1.34</mysql.version>
         <log4j-api.version>2.1</log4j-api.version>
         <log4j-core.version>2.1</log4j-core.version>
+        <apache-commons-lang3.version>3.7</apache-commons-lang3.version>
         <apache-commons-email.version>1.4</apache-commons-email.version>
 
         <hibernate-core.version>4.3.8.Final</hibernate-core.version>
@@ -38,11 +39,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j-api.version}</version>
@@ -56,6 +52,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-email</artifactId>
                 <version>${apache-commons-email.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache-commons-lang3.version}</version>
         </dependency>
 
         <dependency>
@@ -102,6 +103,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j-log4j12.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
         </dependency>
     </dependencies>
     

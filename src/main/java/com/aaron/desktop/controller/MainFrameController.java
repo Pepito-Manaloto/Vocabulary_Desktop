@@ -1,5 +1,6 @@
 package com.aaron.desktop.controller;
 
+import com.aaron.desktop.model.db.ForeignLanguage;
 import com.aaron.desktop.model.db.Vocabulary;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,8 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.Collator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -34,6 +33,7 @@ import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
 import static com.aaron.desktop.view.MainFrameView.PanelName.Add;
 import static com.aaron.desktop.view.MainFrameView.PanelName.View;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -62,7 +62,7 @@ public class MainFrameController
     public void addListeners()
     {   
         this.view.addAddButtonListener(
-            (ActionEvent e) ->
+            (e) ->
             {
                 view.showPanel(Add);
                 view.getSearchTextField().setVisible(false);
@@ -71,7 +71,7 @@ public class MainFrameController
             });
         
         this.view.addViewButtonListener(
-            (ActionEvent e) ->
+            (e) ->
             {    
                 List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
 
@@ -88,13 +88,13 @@ public class MainFrameController
             });
 
         this.view.addForeignLanguageComboBoxListener(
-            (ActionEvent e) ->
+            (e) ->
             {
                 view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
 
                 view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
 
-                MainFrameView.setForeignLanguage(view.getForeignLanguageComboBoxItem());
+                MainFrameView.setForeignLanguage(ForeignLanguage.valueOf(view.getForeignLanguageComboBoxItem()));
                 view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
             });  
 
@@ -103,7 +103,7 @@ public class MainFrameController
         this.view.addBackupButtonListener(new BackupListener(this.view, this.mailer));
         
         this.view.addAboutMenuItemListener(
-            (ActionEvent e) ->
+            (e) ->
             {
                 AboutFrameView aboutFrame = new AboutFrameView();
                 aboutFrame.setLocationRelativeTo(view);
@@ -111,7 +111,7 @@ public class MainFrameController
             });
         
         this.view.addShowLogsMenuItemListener(
-            (ActionEvent e) ->
+            (e) ->
             {
                 LogFrameView logFrame = new LogFrameView();
                 LogManager logger = LogManager.getInstance();
@@ -352,39 +352,49 @@ public class MainFrameController
                 }
                 case KeyEvent.VK_UP:
                 {
-                    if( selectedIndex > -1 ) // there is a selected word in the list.
+                    boolean wordIsSelectedInList = selectedIndex > -1;
+                    int index;
+                    if(wordIsSelectedInList)
                     {
-                        if( selectedIndex  == 0 ) //if at the beginning of the list, move back to end.
+                        boolean isAtTheBeginningOfList = selectedIndex == 0;
+                        if(isAtTheBeginningOfList)
                         {
-                            this.suggestionList.setSelectedIndex(this.suggestionList.getModel().getSize() - 1);               
-                            this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1);
+                            index = suggestionList.getModel().getSize() - 1;
+                            suggestionList.setSelectedIndex(index);               
+                            suggestionList.ensureIndexIsVisible(index);
                         }
                         else
                         {
-                            this.suggestionList.setSelectedIndex(selectedIndex - 1);
-                            this.suggestionList.ensureIndexIsVisible(selectedIndex - 1);
+                            index = selectedIndex - 1;
+                            suggestionList.setSelectedIndex(index);
+                            suggestionList.ensureIndexIsVisible(index);
                         }
                     }
                     else
                     {
-                        this.suggestionList.setSelectedIndex(this.suggestionList.getModel().getSize() - 1);
-                        this.suggestionList.ensureIndexIsVisible(this.suggestionList.getModel().getSize() - 1);
+                        index = suggestionList.getModel().getSize() - 1;
+                        this.suggestionList.setSelectedIndex(index);
+                        this.suggestionList.ensureIndexIsVisible(index);
                     }
                     break;
                 }
                 case KeyEvent.VK_DOWN:
                 {
-                    if( selectedIndex > -1 ) // there is a selected word in the list.
+                    boolean wordIsSelectedInList = selectedIndex > -1;
+                    
+                    if(wordIsSelectedInList)
                     {
-                        if( selectedIndex  == this.suggestionList.getModel().getSize() - 1 ) //if at the end of the list, move back to beginning.
+                        boolean isAtTheEndOfList = selectedIndex == this.suggestionList.getModel().getSize() - 1;
+                        if(isAtTheEndOfList)
                         {
                             this.suggestionList.setSelectedIndex(0); 
                             this.suggestionList.ensureIndexIsVisible(0);
                         }
                         else
                         {
-                            this.suggestionList.setSelectedIndex(selectedIndex + 1);
-                            this.suggestionList.ensureIndexIsVisible(selectedIndex + 1);
+                            int index = selectedIndex + 1;
+                            this.suggestionList.setSelectedIndex(index);
+                            this.suggestionList.ensureIndexIsVisible(index);
                         }
                     }
                     else
@@ -454,7 +464,7 @@ public class MainFrameController
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-            DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+            FastDateFormat dateFormat = FastDateFormat.getInstance("MMMM dd, yyyy");
             Calendar cal = Calendar.getInstance();
             String currentDate = dateFormat.format(cal.getTime());
             String fileName = "my_vocabulary (" + currentDate + ").sql";

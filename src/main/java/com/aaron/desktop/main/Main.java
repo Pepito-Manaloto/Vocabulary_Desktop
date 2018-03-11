@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Main class of Main.
@@ -44,12 +45,32 @@ public final class Main
         Implementation_Vendor,
     }
 
-    private static final Properties properties;
+    private static final Properties PROPERTIES;
     private static final Map<ManifestAttribute, String> APPLICATION_INFO_MAP;
 
     static
     {
-        APPLICATION_INFO_MAP = new EnumMap<>(ManifestAttribute.class);
+        APPLICATION_INFO_MAP = initializeApplicationInfoMap();
+
+        try
+        {
+            PROPERTIES = new Properties();
+            PROPERTIES.load(new FileInputStream("conf/vocabulary.conf"));
+
+            PROPERTIES.entrySet().stream().forEach((entry) ->
+            {
+                System.out.println(entry.getKey() + " = " + entry.getValue());
+            });
+        }
+        catch (IOException ex)
+        {
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    private static Map<ManifestAttribute, String> initializeApplicationInfoMap()
+    {
+        Map<ManifestAttribute, String> infoMap = new EnumMap<>(ManifestAttribute.class);
         // Navigate from its class object to a package object
         Package objPackage = Main.class.getPackage();
 
@@ -58,42 +79,27 @@ public final class Main
         String buildVersion = objPackage.getImplementationVersion();
         String author = objPackage.getImplementationVendor();
 
-        if(title != null && !title.isEmpty())
+        if(StringUtils.isNotBlank(title))
         {
-            APPLICATION_INFO_MAP.put(Specification_Title, title);
+            infoMap.put(Specification_Title, title);
         }
 
-        if(version != null && !version.isEmpty())
+        if(StringUtils.isNotBlank(version))
         {
-            APPLICATION_INFO_MAP.put(Specification_Version, version);
+            infoMap.put(Specification_Version, version);
         }
 
-        if(buildVersion != null && !buildVersion.isEmpty())
+        if(StringUtils.isNotBlank(buildVersion))
         {
-            APPLICATION_INFO_MAP.put(Implementation_Version, buildVersion);
+            infoMap.put(Implementation_Version, buildVersion);
         }
 
-        if(author != null && !author.isEmpty())
+        if(StringUtils.isNotBlank(author))
         {
-            APPLICATION_INFO_MAP.put(Implementation_Vendor, author);
+            infoMap.put(Implementation_Vendor, author);
         }
-
-        try
-        {
-            properties = new Properties();
-            properties.load(new FileInputStream("conf/vocabulary.conf"));
-
-            properties.entrySet().stream().forEach((entry) ->
-            {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            });
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-            throw new ExceptionInInitializerError(ex);
-        }
-
+        
+        return infoMap;
     }
 
     /**
@@ -102,18 +108,35 @@ public final class Main
      */
     public static void main(String[] args)
     {
-        // Set log4j2 async property
-        System.setProperty("log4j.configurationFile", properties.getProperty(Config.LOG4J_CONF.toString()));
-        System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+        setLog4j2AsyncProperties();
 
-        final VocabularyRecord vRecord = new VocabularyRecord();
-        final Mailer mailer = new Mailer(properties.getProperty(Config.EMAIL_SENDER.toString()),
-                                         properties.getProperty(Config.EMAIL_RECIPIENT.toString()));
-        ApplicationLock appLock = new ApplicationLock();
-        
-        appLock.lockApplication("Vocabulary is already running.");
+        VocabularyRecord vRecord = new VocabularyRecord();
+        Mailer mailer = new Mailer(PROPERTIES.getProperty(Config.EMAIL_SENDER.toString()),
+                                         PROPERTIES.getProperty(Config.EMAIL_RECIPIENT.toString()));
+
+        ApplicationLock appLock = lockApplication();
         Runtime.getRuntime().addShutdownHook(new ShutDownHookHandler(appLock, vRecord));
 
+        initializeViewControllerAndAddListeners(vRecord, mailer);
+    }
+
+    private static void setLog4j2AsyncProperties()
+    {
+        // Set log4j2 async property
+        System.setProperty("log4j.configurationFile", PROPERTIES.getProperty(Config.LOG4J_CONF.toString()));
+        System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+    }
+    
+    private static ApplicationLock lockApplication()
+    {
+        ApplicationLock appLock = new ApplicationLock();
+        appLock.lockApplication("Vocabulary is already running.");
+        
+        return appLock;
+    }
+    
+    private static void initializeViewControllerAndAddListeners(final VocabularyRecord vRecord, final Mailer mailer)
+    {
         EventQueue.invokeLater(() -> {
             ViewManager.init();
             
@@ -133,7 +156,7 @@ public final class Main
             mainView.setVisible(true);
         });
     }
-
+    
     /**
      * Returns the manifest info about the application.
      * @param attribute the manifest attribute to get

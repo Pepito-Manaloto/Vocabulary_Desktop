@@ -38,7 +38,7 @@ public class LogFrameView extends javax.swing.JFrame
         initComponents();  
 
         this.logTextPane.getCaret().setVisible(true);
-        this.setSize(1200, 700);
+        super.setSize(1200, 700);
     }
 
     /**

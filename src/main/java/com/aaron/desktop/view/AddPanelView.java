@@ -12,6 +12,7 @@ package com.aaron.desktop.view;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
@@ -89,11 +90,8 @@ public final class AddPanelView extends javax.swing.JPanel
      * @param listener the listener
      */
     public void addAccentedButtonsListener(final ActionListener listener)
-    {
-        for(int i = 0; i < NUMBER_OF_ACCENTED_BUTTONS; i++)
-        {
-            this.accentedButtons[i].addActionListener(listener);  
-        }
+    {       
+        Arrays.stream(accentedButtons).forEach(b -> b.addActionListener(listener));
     }
     
     /**
@@ -116,13 +114,13 @@ public final class AddPanelView extends javax.swing.JPanel
 
     /**
      * Sets the key listener for foreign text field.
-     * @param listener1 the key listener
-     * @param listener2 the caret listener
+     * @param keyListener the key listener
+     * @param caretListener the caret listener
      */
-    public void addForeignTextFieldListener(final KeyListener listener1, final CaretListener listener2)
+    public void addForeignTextFieldListener(final KeyListener keyListener, final CaretListener caretListener)
     {
-        this.foreignTextField.addKeyListener(listener1);
-        this.foreignTextField.addCaretListener(listener2);
+        this.foreignTextField.addKeyListener(keyListener);
+        this.foreignTextField.addCaretListener(caretListener);
     }
     
     /**

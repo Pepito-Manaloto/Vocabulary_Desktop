@@ -19,6 +19,8 @@ import javax.swing.table.DefaultTableModel;
 import com.aaron.desktop.model.db.Vocabulary;
 
 import static com.aaron.desktop.model.db.ForeignLanguage.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * View panel of Vocabulary
@@ -118,27 +120,34 @@ public final class ViewPanelView extends javax.swing.JPanel {
     {
         this.table.getDataVector().removeAllElements(); // Clears the table
 
-        vocabularyList.stream().forEach(
-           (Vocabulary v) ->
-            {
-                // Fills the table
-                this.table.addRow(v.getVocabularyAsObject());
-            }); 
+        Function<Vocabulary, Object[]> vocabularyToObjectArray = (v) -> v.getVocabularyAsObject();
+        Consumer<Object[]> addVocabularyToTable = (v) -> this.table.addRow(v);
+        vocabularyList.stream().map(vocabularyToObjectArray).forEach(addVocabularyToTable);
 
         if(Hokkien.equals(MainFrameView.getforeignLanguage()))
         {
-            this.vocabularyTable.setFont(ViewManager.MEIRYO14);
-            this.vocabularyTable.setRowHeight(16);
-            this.vocabularyTable.getColumnModel().getColumn(0).setPreferredWidth(80);
+            setVocabularyTablePropertiesOnEnglishCharacters();
         }
-        else //Increase size for non english characters
+        else
         {
-            this.vocabularyTable.setFont(ViewManager.MEIRYO19);
-            this.vocabularyTable.setRowHeight(26);
-            this.vocabularyTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+            setVocabularyTablePropertiesOnNonEnglishCharacters();
         }
 
         this.vocabularyTable.repaint();
+    }
+    
+    private void setVocabularyTablePropertiesOnEnglishCharacters()
+    {
+        this.vocabularyTable.setFont(ViewManager.MEIRYO14);
+        this.vocabularyTable.setRowHeight(16);
+        this.vocabularyTable.getColumnModel().getColumn(0).setPreferredWidth(80);
+    }
+    
+    private void setVocabularyTablePropertiesOnNonEnglishCharacters()
+    {
+        this.vocabularyTable.setFont(ViewManager.MEIRYO19);
+        this.vocabularyTable.setRowHeight(26);
+        this.vocabularyTable.getColumnModel().getColumn(0).setPreferredWidth(300);
     }
 
     /**

@@ -5,14 +5,20 @@
  */
 package com.aaron.desktop.model.db;
 
+import static java.util.Objects.*;
+
 import com.aaron.desktop.model.log.LogManager;
 import com.aaron.desktop.model.others.Resource;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.JDBCException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
@@ -20,7 +26,7 @@ import org.hibernate.cfg.Configuration;
  *
  * @author Aaron
  */
-public class HibernateUtil 
+public final class HibernateUtil 
 {
     private static SessionFactory sessionFactory;
     private static final LogManager logger = LogManager.getInstance();
@@ -58,7 +64,7 @@ public class HibernateUtil
     {
         try
         {
-            if(sessionFactory == null)
+            if(isNull(sessionFactory))
             {
                 sessionFactory = cfg.buildSessionFactory(builder.build());
             }
@@ -75,9 +81,36 @@ public class HibernateUtil
         }
     }
 
+    public static Boolean wrapInTransaction(Function<Session, Boolean> databaseTransaction, Consumer<JDBCException> databaseExceptionAction)
+    {
+        Session session = HibernateUtil.getInstance();
+        Boolean result = Boolean.FALSE;
+
+        if(nonNull(session))
+        {
+            Transaction transaction = session.beginTransaction();
+            try
+            {      
+                result = databaseTransaction.apply(session);
+                transaction.commit();
+            }
+            catch(final JDBCException e)
+            {
+                transaction.rollback();
+                databaseExceptionAction.accept(e);
+            }
+            finally
+            {
+                session.close();
+            }
+        }
+        
+        return result;
+    }
+    
     public static void close()
     {
-        if(sessionFactory != null)
+        if(nonNull(sessionFactory))
         {
             sessionFactory.close();
         }

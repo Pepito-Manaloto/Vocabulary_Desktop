@@ -21,6 +21,9 @@ import com.aaron.desktop.model.log.LogFileCheckerThread;
 import com.aaron.desktop.model.log.LogLevel;
 import com.aaron.desktop.model.log.LogManager;
 import com.aaron.desktop.view.LogFrameView;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  *
@@ -29,7 +32,7 @@ import com.aaron.desktop.view.LogFrameView;
 public class LogFrameController
 {
     private final LogManager logger;
-    private LogFrameView view;
+    private final LogFrameView view;
 
     public LogFrameController(final LogFrameView logFrame, final LogManager logger) 
     {
@@ -69,7 +72,7 @@ public class LogFrameController
         
         try 
         {
-            this.view.init(this.logger.getMessageLogFromFile("logs/vocabulary.log"));
+            this.view.init(this.logger.getMessageLogFromFile());
         } 
         catch(final IOException | BadLocationException ex) 
         {
@@ -109,15 +112,13 @@ public class LogFrameController
                 try 
                 {
                     LinkedHashMap<String, LogLevel> filteredLogMessages = new LinkedHashMap<>();
+                    Predicate<Entry<String, LogLevel>> messageContainsSearchString = (entry) -> entry.getKey().contains(searchString);
+                    Consumer<Entry<String, LogLevel>> putIntoFilteredLogMessages = (entry) -> filteredLogMessages.put(entry.getKey(), entry.getValue());
+                    logFrame.getLogMessages().entrySet().stream()
+                            .filter(messageContainsSearchString)
+                            .forEach(putIntoFilteredLogMessages); 
 
-                    this.logFrame.getLogMessages().keySet().stream().filter(
-                        (String message) -> message.contains(searchString)).forEach(
-                            (String message) ->
-                            {
-                                filteredLogMessages.put(message, this.logFrame.getLogMessages().get(message));
-                            }); 
-
-                    this.logFrame.fillLog(filteredLogMessages);
+                    logFrame.fillLog(filteredLogMessages);
                 }
                 catch(final BadLocationException ex) 
                 {
@@ -128,7 +129,7 @@ public class LogFrameController
             {
                 try 
                 {
-                    this.logFrame.init(this.logger.getMessageLogFromFile("logs/vocabulary.log"));
+                    this.logFrame.init(this.logger.getMessageLogFromFile());
                 } 
                 catch(final IOException | BadLocationException ex) 
                 {

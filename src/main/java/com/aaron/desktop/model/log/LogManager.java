@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.Logger;
@@ -18,10 +19,12 @@ import org.apache.logging.log4j.Logger;
  */
 public final class LogManager
 {    
-    private final Logger logger;
     private static final LogManager logManager = new LogManager();
     private static final AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
+    private static final String LOG_FILE = "logs/vocabulary.log";
 
+    private final Logger logger;
+ 
     /**
      * Private constructor initializes log4j. 
      */
@@ -144,28 +147,34 @@ public final class LogManager
 
     /**
      * Gets all messages in the log and stores it to a map with the message as key.
-     * @param logPath the path of the log file
+     *
      * @throws IOException
      * @return the log messages
      */
-    public LinkedHashMap<String, LogLevel> getMessageLogFromFile(final String logPath) throws IOException
+    public LinkedHashMap<String, LogLevel> getMessageLogFromFile() throws IOException
     {
         LinkedHashMap<String, LogLevel> messageList = new LinkedHashMap<>();
-        
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(logPath), "UTF-8"));
-        String line;
-        
-        while( (line = br.readLine()) != null) //Gets each message
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(LOG_FILE), StandardCharsets.UTF_8));)
         {
-            for(LogLevel level: LogLevel.values()) //Puts message as the key and it log level as value
+            String line;
+
+            while((line = br.readLine()) != null) //Gets each message
             {
-                if(line.contains(level.toString()))
-                {
-                    messageList.put(line, level);
-                }     
-            }    
+                putLogLineAndLevelInMessageList(messageList, line);
+            }
         }
-        
+
         return messageList;
+    }
+    
+    private void putLogLineAndLevelInMessageList(LinkedHashMap<String, LogLevel> messageList, String logLine)
+    {
+        for(LogLevel level: LogLevel.values()) //Puts message as the key and its log level as value
+        {
+            if(logLine.contains(level.toString()))
+            {
+                messageList.put(logLine, level);
+            }
+        }
     }
 }

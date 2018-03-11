@@ -16,6 +16,7 @@ import com.aaron.desktop.model.db.Vocabulary;
 import com.aaron.desktop.model.db.VocabularyRecord;
 import com.aaron.desktop.view.AddPanelView;
 import com.aaron.desktop.view.MainFrameView;
+import javax.swing.event.CaretListener;
 
 /**
  *
@@ -39,11 +40,8 @@ public class AddPanelController
     {
         this.view.addAccentedButtonsListener(new AccentedButtonListener(this.view));
 
-        this.view.addAddButtonListener(
-            (ActionEvent e) ->
-            {
-                insertToDatabase();
-            });
+        ActionListener insertToDatabase = (e) -> insertToDatabase();
+        view.addAddButtonListener(insertToDatabase);
 
         KeyAdapter fieldAddButtonListener = new KeyAdapter() 
             {
@@ -56,13 +54,10 @@ public class AddPanelController
                     }
                 }
             };
+        CaretListener caretListener = (e) -> view.setCurrentCaretPosition(e.getDot());
 
         this.view.addEnglishTextFieldListener(fieldAddButtonListener);
-        this.view.addForeignTextFieldListener(fieldAddButtonListener,
-            (CaretEvent ce) -> 
-            {
-                view.setCurrentCaretPosition(ce.getDot());
-            });
+        this.view.addForeignTextFieldListener(fieldAddButtonListener, caretListener);
     }
     
         
