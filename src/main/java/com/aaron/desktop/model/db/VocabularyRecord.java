@@ -37,19 +37,20 @@ public class VocabularyRecord
      */
     public boolean addToDatabase(final Vocabulary vocabObject)
     {
-        Function<Session, Boolean> saveVocabulary = (session) ->
-        {
-            session.save(vocabObject);
-            return true;
-        };
-        
-        Consumer<JDBCException> jdbcExceptionHandler = (e) ->
-        {
-                JOptionPane.showMessageDialog(null, vocabObject.getEnglishWord() + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-                this.logger.error(this.className, "addToDatabase(Vocabulary)", e.getSQLException().getMessage(), e);
-        };
-        
-        return HibernateUtil.wrapInTransaction(saveVocabulary, jdbcExceptionHandler);
+        return HibernateUtil.wrapInTransaction(session -> saveVocabulary(session, vocabObject),
+                                               e -> saveVocabularyExceptionHandler(e, vocabObject));
+    }
+
+    private boolean saveVocabulary(Session session, Vocabulary vocabObject)
+    {
+        session.save(vocabObject);
+        return true;
+    }
+
+    private void saveVocabularyExceptionHandler(JDBCException e, Vocabulary vocabObject)
+    {
+        JOptionPane.showMessageDialog(null, vocabObject.getEnglishWord() + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
+        this.logger.error(this.className, "addToDatabase(Vocabulary)", e.getSQLException().getMessage(), e);
     }
 
     /**
@@ -58,23 +59,19 @@ public class VocabularyRecord
      */
     public void deleteVocabulary(final String selectedWord)
     {
-        Function<Session, Boolean> deleteVocabulary = (session) ->
-        {
-            Query query = session.createQuery("delete Vocabulary where english_word = :word");
-
-            query.setString("word", selectedWord);
-            query.executeUpdate();
-            return true;
-        };
-        
-        Consumer<JDBCException> jdbcExceptionHandler = (e) ->
-        {
-            this.logger.error(this.className, "deleteVocabulary(String)", e.getSQLException().getMessage(), e);
-        };
-
-        HibernateUtil.wrapInTransaction(deleteVocabulary, jdbcExceptionHandler);
+        HibernateUtil.wrapInTransaction(session -> deleteVocabulary(session, selectedWord),
+                                        e -> logger.error(this.className, "deleteVocabulary(String)", e.getSQLException().getMessage(), e));
     }
     
+    private boolean deleteVocabulary(Session session, String selectedWord)
+    {
+        Query query = session.createQuery("delete Vocabulary where english_word = :word");
+
+        query.setString("word", selectedWord);
+        query.executeUpdate();
+        return true;
+    }
+
     /**
      * Updates a vocabulary in the database.
      * @param vocabObject object containing English and foreign word counterpart, and foreign language.
@@ -82,31 +79,33 @@ public class VocabularyRecord
      */
     public void updateVocabulary(final Vocabulary vocabObject, final int column)
     {
-        Function<Session, Boolean> updateVocabulary = (session) ->
-        {
-            String queryString = buildUpdateQuery(column);
-            if(isNull(queryString))
-            {
-                return false;
-            }
-            Query query = session.createQuery(queryString);
-            query.setString("eword", vocabObject.getEnglishWord());
-            query.setString("fword", vocabObject.getForeignWord());
-            query.setInteger("fid", vocabObject.getForeignId());
-            query.executeUpdate();
-            return true;
-        };
-
-        Consumer<JDBCException> jdbcExceptionHandler = (e) ->
-        {
-            final String[] newWord = vocabObject.getEnglishWord().split(ENGLISH_WORD_SEPARATOR);    
-            JOptionPane.showMessageDialog(null, newWord[newWord.length - 1] + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-            this.logger.error(this.className, "updateVocabulary(Vocabulary, int)", e.getSQLException().getMessage(), e);
-        };
-
-        HibernateUtil.wrapInTransaction(updateVocabulary, jdbcExceptionHandler);
+        HibernateUtil.wrapInTransaction(session -> updateVocabulary(session, vocabObject, column),
+                                        e -> updateVocabularyExceptionHandler(e, vocabObject));
     }
-    
+
+    private boolean updateVocabulary(Session session, Vocabulary vocabObject, int column)
+    {
+        String queryString = buildUpdateQuery(column);
+        if(isNull(queryString))
+        {
+            return false;
+        }
+
+        Query query = session.createQuery(queryString);
+        query.setString("eword", vocabObject.getEnglishWord());
+        query.setString("fword", vocabObject.getForeignWord());
+        query.setInteger("fid", vocabObject.getForeignId());
+        query.executeUpdate();
+        return true;
+    }
+
+    private void updateVocabularyExceptionHandler(JDBCException e, Vocabulary vocabObject)
+    {
+        final String[] newWord = vocabObject.getEnglishWord().split(ENGLISH_WORD_SEPARATOR);    
+        JOptionPane.showMessageDialog(null, newWord[newWord.length - 1] + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
+        this.logger.error(this.className, "updateVocabulary(Vocabulary, int)", e.getSQLException().getMessage(), e);
+    }
+
     private String buildUpdateQuery(int column)
     {
         String queryString = "update Vocabulary set ";

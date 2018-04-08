@@ -27,8 +27,6 @@ public final class ApplicationLock
     private File lockFile = null;
     private FileChannel channel = null;
     private FileLock lock = null;   
-    
-    
 
     /**
      * Ensures that only one application can run at a time. Uses FileLock technique.  

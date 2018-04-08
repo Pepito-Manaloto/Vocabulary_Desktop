@@ -37,7 +37,7 @@ public class ViewPanelController
      */
     public void addListeners() 
     {
-        ActionListener comboBoxListener = (e) -> view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
+        ActionListener comboBoxListener = e -> view.refreshTable(model.getVocabularies(view.getLetterComboBoxItem()));
         this.view.addLetterComboBoxListener(comboBoxListener);
         this.view.addVocabularyTableListener(new TableChangeListener(this.view, this.model), new TableKeyListener(this.view, this.model));
     }

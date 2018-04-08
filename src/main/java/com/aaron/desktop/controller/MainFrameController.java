@@ -3,7 +3,6 @@ package com.aaron.desktop.controller;
 import com.aaron.desktop.model.db.ForeignLanguage;
 import com.aaron.desktop.model.db.Vocabulary;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -33,6 +32,7 @@ import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
 import static com.aaron.desktop.view.MainFrameView.PanelName.Add;
 import static com.aaron.desktop.view.MainFrameView.PanelName.View;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 /*
@@ -47,6 +47,10 @@ import org.apache.commons.lang3.time.FastDateFormat;
  */
 public class MainFrameController
 {
+    private static final String BACKUP_FILENAME = "my_vocabulary (%s).sql";
+    private static final String BACKUP_FOLDER = "./backup";
+    private static final String BACKUP_SCRIPT = "mysqldump --routines -uroot -proot --add-drop-database -B my_vocabulary -r \"%s\"";
+    
     private final MainFrameView view;
     private final VocabularyRecord model;
     private final Mailer mailer;
@@ -57,72 +61,113 @@ public class MainFrameController
         this.model = model;
         this.mailer = mailer;
     }
-    
+
     // adds event listener to all mainFrame's component.
     public void addListeners()
     {   
-        this.view.addAddButtonListener(
-            (e) ->
-            {
-                view.showPanel(Add);
-                view.getSearchTextField().setVisible(false);
-                view.getSearchTextField().setText("");
-                view.getSuggestListScrollPane().setVisible(false);
-            });
-        
-        this.view.addViewButtonListener(
-            (e) ->
-            {    
-                List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
-
-                if(vocabList.isEmpty())
-                {
-                    JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                else
-                {
-                    view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
-                    view.getSearchTextField().setVisible(true);
-                    view.getAddPanelView().clearTextfields();
-                }
-            });
-
-        this.view.addForeignLanguageComboBoxListener(
-            (e) ->
-            {
-                view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
-
-                view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
-
-                MainFrameView.setForeignLanguage(ForeignLanguage.valueOf(view.getForeignLanguageComboBoxItem()));
-                view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
-            });  
-
+        this.view.addAddButtonListener(this::addButtonListener);
+        this.view.addViewButtonListener(this::viewButtonListener);
+        this.view.addForeignLanguageComboBoxListener(this::foreignLanguageComboBoxListener);
         this.view.addSuggestionListListener(new SuggestionListListener(this.view));
         this.view.addSearchTextFieldListener(new SearchTextFieldListener(this.view));
-        this.view.addBackupButtonListener(new BackupListener(this.view, this.mailer));
-        
-        this.view.addAboutMenuItemListener(
-            (e) ->
-            {
-                AboutFrameView aboutFrame = new AboutFrameView();
-                aboutFrame.setLocationRelativeTo(view);
-                aboutFrame.setVisible(true);
-            });
-        
-        this.view.addShowLogsMenuItemListener(
-            (e) ->
-            {
-                LogFrameView logFrame = new LogFrameView();
-                LogManager logger = LogManager.getInstance();
-                LogFrameController logFrameController = new LogFrameController(logFrame, logger);
+        this.view.addBackupButtonListener(this::backupButtonListener);
+        this.view.addAboutMenuItemListener(this::aboutMenuItemListener);
+        this.view.addShowLogsMenuItemListener(this::showLogsMenuItemListener);
+    }
 
-                logFrameController.addListeners();
-                logFrame.setLocationRelativeTo(view);
-                logFrame.setVisible(true);
-            });
+    private void addButtonListener(ActionEvent e)
+    {
+        view.showPanel(Add);
+        view.getSearchTextField().setVisible(false);
+        view.getSearchTextField().setText("");
+        view.getSuggestListScrollPane().setVisible(false);
     }
     
+    private void viewButtonListener(ActionEvent e)
+    {
+        List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
+
+        if(vocabList.isEmpty())
+        {
+            JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
+            view.getSearchTextField().setVisible(true);
+            view.getAddPanelView().clearTextfields();
+        }
+    }
+
+    private void backupButtonListener(ActionEvent e)
+    {
+        FastDateFormat dateFormat = FastDateFormat.getInstance("MMMM dd, yyyy");
+        Calendar cal = Calendar.getInstance();
+        String currentDate = dateFormat.format(cal.getTime());
+        String fileName = String.format(BACKUP_FILENAME, currentDate);
+        String backupScript = String.format(BACKUP_SCRIPT, fileName);
+        File dir = new File(BACKUP_FOLDER);
+
+        if(!dir.exists())
+        {
+            dir.mkdir();
+        }
+
+        CommandLineScript cmdScript = new CommandLineScript();
+        boolean success = cmdScript.execute(backupScript, BACKUP_FOLDER);
+
+        int result = JOptionPane.showConfirmDialog(this.view, "Do you want to email the backup?", "Email Confirmation",
+                                                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if(success)
+        {
+            JOptionPane.showMessageDialog(this.view, "Backup created successfully", "Info", JOptionPane.INFORMATION_MESSAGE);
+        }    
+        else
+        {
+            JOptionPane.showMessageDialog(this.view, cmdScript.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        if(result == JOptionPane.YES_OPTION)
+        {
+            success = this.mailer.sendMail("Vocabulary backup " + currentDate, " ", BACKUP_FOLDER + "/" + fileName);
+
+            if(success)
+            {
+                JOptionPane.showMessageDialog(this.view, "Backup sent to mail", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }    
+            else
+            {
+                JOptionPane.showMessageDialog(this.view, this.mailer.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void foreignLanguageComboBoxListener(ActionEvent e)
+    {
+        view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
+        view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
+        MainFrameView.setForeignLanguage(ForeignLanguage.valueOf(view.getForeignLanguageComboBoxItem()));
+        view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
+    }
+    
+    private void aboutMenuItemListener(ActionEvent e)
+    {
+        AboutFrameView aboutFrame = new AboutFrameView();
+        aboutFrame.setLocationRelativeTo(view);
+        aboutFrame.setVisible(true);
+    }
+
+    private void showLogsMenuItemListener(ActionEvent e)
+    {
+        LogFrameView logFrame = new LogFrameView();
+        LogManager logger = LogManager.getInstance();
+        LogFrameController logFrameController = new LogFrameController(logFrame, logger);
+
+        logFrameController.addListeners();
+        logFrame.setLocationRelativeTo(view);
+        logFrame.setVisible(true);
+    }
+
     /**
      * Suggestion list mouse listener class.
      */
@@ -219,10 +264,7 @@ public class MainFrameController
 
                 // Used by keylistener "enter", for multiple identical search word results.
                 this.searchWordIndex = new int[searchedWordList.size()];
-                for(int i = 0; i < this.searchWordIndex.length; i++)
-                {
-                    this.searchWordIndex[i] = searchedWordList.get(i);
-                }
+                IntStream.range(0, searchedWordList.size()).forEach(i -> searchWordIndex[i] = searchedWordList.get(i));
 
                 this.updateSuggestionListHeight(searchedWord);
             }
@@ -440,70 +482,6 @@ public class MainFrameController
         public void focusLost(FocusEvent e)
         {
             this.suggestListScrollPane.setVisible(false);
-        }
-    }
-    
-    /**
-     * Backup button listener class
-     */
-    private static class BackupListener implements ActionListener
-    {
-        private final MainFrameView view;
-        private final Mailer mailer;
-
-        public BackupListener(final MainFrameView view, final Mailer mailer)
-        {
-            this.view = view;
-            this.mailer = mailer;
-        }
-
-        /**
-         * Creates a backup of the MySQL database.
-         * @param e action event
-         */
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-            FastDateFormat dateFormat = FastDateFormat.getInstance("MMMM dd, yyyy");
-            Calendar cal = Calendar.getInstance();
-            String currentDate = dateFormat.format(cal.getTime());
-            String fileName = "my_vocabulary (" + currentDate + ").sql";
-            String backupScript = "mysqldump --routines -uroot -proot --add-drop-database -B my_vocabulary -r \"" + fileName + "\"";
-            String path = "./backup";
-            File dir = new File(path);
-
-            if(!dir.exists())
-            {
-                dir.mkdir();
-            }
-
-            CommandLineScript cmdScript = new CommandLineScript();
-            boolean success = cmdScript.execute(backupScript, path);
-
-            int result = JOptionPane.showConfirmDialog(this.view, "Do you want to email the backup?", "Email Confirmation",
-                                                       JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if(success)
-            {
-                JOptionPane.showMessageDialog(this.view, "Backup created successfully", "Info", JOptionPane.INFORMATION_MESSAGE);
-            }    
-            else
-            {
-                JOptionPane.showMessageDialog(this.view, cmdScript.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-            if(result == JOptionPane.YES_OPTION)
-            {
-                success = this.mailer.sendMail("Vocabulary backup " + currentDate, " ", path + "/" + fileName);
-                
-                if(success)
-                {
-                    JOptionPane.showMessageDialog(this.view, "Backup sent to mail", "Info", JOptionPane.INFORMATION_MESSAGE);
-                }    
-                else
-                {
-                    JOptionPane.showMessageDialog(this.view, this.mailer.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
         }
     }
 }
