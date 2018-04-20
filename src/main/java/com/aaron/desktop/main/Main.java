@@ -22,6 +22,8 @@ import com.aaron.desktop.model.others.Mailer;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,10 +59,10 @@ public final class Main
             PROPERTIES = new Properties();
             PROPERTIES.load(new FileInputStream("conf/vocabulary.conf"));
 
-            PROPERTIES.entrySet().stream().forEach((entry) ->
+            for(Entry<Object, Object> entry : PROPERTIES.entrySet())
             {
                 System.out.println(entry.getKey() + " = " + entry.getValue());
-            });
+            }
         }
         catch (IOException ex)
         {

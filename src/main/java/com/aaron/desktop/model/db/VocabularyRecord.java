@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import com.aaron.desktop.view.MainFrameView;
 import java.util.Collections;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import org.hibernate.Criteria;
 import org.hibernate.JDBCException;

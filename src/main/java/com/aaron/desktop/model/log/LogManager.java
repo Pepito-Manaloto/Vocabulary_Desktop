@@ -19,8 +19,8 @@ import org.apache.logging.log4j.Logger;
  */
 public final class LogManager
 {    
-    private static final LogManager logManager = new LogManager();
-    private static final AtomicBoolean updated = new AtomicBoolean(); // In-case multiple threads use this flag.
+    private static final LogManager LOG_MANAGER = new LogManager();
+    private static final AtomicBoolean UPDATED = new AtomicBoolean(); // In-case multiple threads use this flag.
     private static final String LOG_FILE = "logs/vocabulary.log";
 
     private final Logger logger;
@@ -39,7 +39,7 @@ public final class LogManager
      */
     public static boolean isUpdated()
     {
-        return updated.get();
+        return UPDATED.get();
     }
     
     /**
@@ -47,7 +47,7 @@ public final class LogManager
      */
     public static void finishedUpdating()
     {
-        updated.set(false);
+        UPDATED.set(false);
     }
     
     /**
@@ -56,7 +56,7 @@ public final class LogManager
      */
     public static LogManager getInstance()
     {
-        return logManager;
+        return LOG_MANAGER;
     }
     
     /**
@@ -68,7 +68,7 @@ public final class LogManager
     public void debug(final String className, final String methodName, final String message)
     {
        this.logger.debug(className + " in " + methodName + ": " + message);
-       updated.set(true);
+       UPDATED.set(true);
     }
     
     /**
@@ -80,7 +80,7 @@ public final class LogManager
     public void info(final String className, final String methodName, final String message)
     {
         this.logger.info(className + " in " + methodName + ": " + message);
-        updated.set(true);
+        UPDATED.set(true);
     }
     
     /**
@@ -92,7 +92,7 @@ public final class LogManager
     public void warn(final String className, final String methodName, final String message)
     {
         this.logger.warn(className + " in " + methodName + ": " + message);
-        updated.set(true);
+        UPDATED.set(true);
     }
     
     /**
@@ -104,7 +104,7 @@ public final class LogManager
     public void error(final String className, final String methodName, final String message)
     {
         this.logger.error(className + " in " + methodName + ": " + message);
-        updated.set(true);
+        UPDATED.set(true);
     }
     
     /**
@@ -117,7 +117,7 @@ public final class LogManager
     public void error(final String className, final String methodName, final String message, final Throwable e)
     {
         this.logger.error(className + " in " + methodName + ": " + message, e);
-        updated.set(true);
+        UPDATED.set(true);
     }
 
     /**
@@ -129,7 +129,7 @@ public final class LogManager
     public void fatal(final String className, final String methodName, final String message)
     {
         this.logger.fatal(className + " in " + methodName + ": " + message);
-        updated.set(true);
+        UPDATED.set(true);
     }
 
     /**
@@ -142,7 +142,7 @@ public final class LogManager
     public void fatal(final String className, final String methodName, final String message, final Throwable e)
     {
         this.logger.fatal(className + " in " + methodName + ": " + message, e);
-        updated.set(true);
+        UPDATED.set(true);
     }
 
     /**

@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
-import javax.swing.event.CaretEvent;
 import com.aaron.desktop.model.db.Vocabulary;
 import com.aaron.desktop.model.db.VocabularyRecord;
 import com.aaron.desktop.view.AddPanelView;

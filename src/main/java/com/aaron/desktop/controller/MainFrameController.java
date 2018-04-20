@@ -264,7 +264,11 @@ public class MainFrameController
 
                 // Used by keylistener "enter", for multiple identical search word results.
                 this.searchWordIndex = new int[searchedWordList.size()];
-                IntStream.range(0, searchedWordList.size()).forEach(i -> searchWordIndex[i] = searchedWordList.get(i));
+                int i = 0;
+                for(Integer index: searchedWordList)
+                {
+                    searchWordIndex[i++] = index;
+                }
 
                 this.updateSuggestionListHeight(searchedWord);
             }

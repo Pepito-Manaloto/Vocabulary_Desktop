@@ -65,14 +65,14 @@ public class ViewPanelController
         public void tableChanged(final TableModelEvent e)
         {
             boolean isCellUpdated = e.getLastRow() >= 0 && e.getType() == 0;
-            if (isCellUpdated)
+            if(isCellUpdated)
             {
                 String wordEnglish = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 0).toString();
                 String wordForeign = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 1).toString();
 
                 int response = JOptionPane.showConfirmDialog(this.view, "Do you want to save?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-                if (response == JOptionPane.YES_OPTION)
+                if(response == JOptionPane.YES_OPTION)
                 {
                     this.model.updateVocabulary(new Vocabulary(wordEnglish, wordForeign, MainFrameView.getforeignLanguage()),
                                                 e.getColumn());
@@ -108,14 +108,14 @@ public class ViewPanelController
         public void keyPressed(final KeyEvent e) 
         {
             boolean isDelete = view.getVocabularyTable().getSelectedRow() >= 0 && e.getKeyCode() == KeyEvent.VK_DELETE;
-            if (isDelete) 
+            if(isDelete) 
             {
                 String selectedWord = this.view.getDefaultTableModel().getValueAt(this.view.getVocabularyTable().getSelectedRow(), 0).toString();
 
                 int response = JOptionPane.showConfirmDialog(this.view, "Are you sure to delete \"" + selectedWord + "\" from the vocabulary?",
                                                               "Confirmation", JOptionPane.YES_NO_OPTION);
 
-                if (response == JOptionPane.YES_OPTION)
+                if(response == JOptionPane.YES_OPTION)
                 {
                     this.model.deleteVocabulary(selectedWord);
                     this.view.getDefaultTableModel().removeRow(this.view.getVocabularyTable().getSelectedRow());
