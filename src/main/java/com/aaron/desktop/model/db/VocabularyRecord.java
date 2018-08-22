@@ -4,21 +4,23 @@
  */
 package com.aaron.desktop.model.db;
 
-import static java.util.Objects.*;
+import com.aaron.desktop.entity.ForeignLanguage;
+import com.aaron.desktop.entity.Vocabulary;
 
 import com.aaron.desktop.model.log.LogManager;
 import java.util.List;
 import javax.swing.JOptionPane;
 import com.aaron.desktop.view.MainFrameView;
 import java.util.Collections;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import org.hibernate.Criteria;
-import org.hibernate.JDBCException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import java.util.Map;
+import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,100 +31,99 @@ public class VocabularyRecord
     private final LogManager logger = LogManager.getInstance();
     private final String className = this.getClass().getSimpleName();
     private static final String ENGLISH_WORD_SEPARATOR = "/";
-    
+    private Map<ForeignLanguage, List<Vocabulary>> vocabulariesMap;
+
+    public List<ForeignLanguage> getForeignLanguages()
+    {
+        long start = System.currentTimeMillis();
+        EntityManager em = JPAUtil.getEntityManager();
+        List<ForeignLanguage> list = em.createNamedQuery(ForeignLanguage.GET_ALL, ForeignLanguage.class).getResultList();
+
+        logger.info(className, "getForeignLanguages", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
+        //vocabulariesMap = list.stream().collect(toMap(identity(), ForeignLanguage::getVocabularies));
+     
+        return list;
+    }
+
     /**
-     * adds a new vocabulary in the database and checks if it is successful.
+     * saves a new vocabulary in the database and checks if it is successful.
      * @param vocabObject object containing English and foreign word counterpart, and foreign language.
-     * @return boolean
+     * @return true if success
      */
-    public boolean addToDatabase(final Vocabulary vocabObject)
+    public boolean saveToDatabase(final Vocabulary vocabObject)
     {
-        return HibernateUtil.wrapInTransaction(session -> saveVocabulary(session, vocabObject),
-                                               e -> saveVocabularyExceptionHandler(e, vocabObject));
+        long start = System.currentTimeMillis();
+
+        Optional<Boolean> result = JPAUtil.transactAndReturn(em -> 
+        {
+            em.persist(vocabObject);
+            return Optional.of(true);
+        }, e -> saveVocabularyExceptionHandler(e, vocabObject));
+        
+        logger.info(className, "saveToDatabase", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
+        
+        return result.orElse(false);
     }
 
-    private boolean saveVocabulary(Session session, Vocabulary vocabObject)
-    {
-        session.save(vocabObject);
-        return true;
-    }
-
-    private void saveVocabularyExceptionHandler(JDBCException e, Vocabulary vocabObject)
+    private void saveVocabularyExceptionHandler(Exception e, Vocabulary vocabObject)
     {
         JOptionPane.showMessageDialog(null, vocabObject.getEnglishWord() + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-        this.logger.error(this.className, "addToDatabase(Vocabulary)", e.getSQLException().getMessage(), e);
+        this.logger.error(this.className, "addToDatabase(Vocabulary)", e.getMessage(), e);
     }
 
     /**
      * Deletes a vocabulary in the database. 
      * @param selectedWord vocabulary to delete
+     * @return true if success
      */
-    public void deleteVocabulary(final String selectedWord)
+    public boolean deleteVocabulary(final String selectedWord)
     {
-        HibernateUtil.wrapInTransaction(session -> deleteVocabulary(session, selectedWord),
-                                        e -> logger.error(this.className, "deleteVocabulary(String)", e.getSQLException().getMessage(), e));
+        long start = System.currentTimeMillis();
+
+        Optional<Boolean> result = JPAUtil.transactAndReturn(em -> Optional.of(deleteVocabulary(em, selectedWord)),
+                                        e -> logger.error(this.className, "deleteVocabulary(String)", e.getMessage(), e));
+
+        logger.info(className, "deleteVocabulary", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
+
+        return result.orElse(false);
     }
     
-    private boolean deleteVocabulary(Session session, String selectedWord)
+    private boolean deleteVocabulary(EntityManager em, String selectedWord)
     {
-        Query query = session.createQuery("delete Vocabulary where english_word = :word");
+        Query query = em.createQuery("DELETE FROM Vocabulary WHERE englishWord = :word");
+        query.setParameter("word", selectedWord);
 
-        query.setString("word", selectedWord);
-        query.executeUpdate();
-        return true;
+        return query.executeUpdate() > 0;
     }
 
     /**
      * Updates a vocabulary in the database.
-     * @param vocabObject object containing English and foreign word counterpart, and foreign language.
-     * @param column
+     * @param id the primary key of the vocabulary
+     * @param englishWord the new english word
+     * @param foreignWord the new foreign word
+     * @return managed updated Vocabulary
      */
-    public void updateVocabulary(final Vocabulary vocabObject, final int column)
+    public Vocabulary updateVocabulary(final int id, final String englishWord, final String foreignWord)
     {
-        HibernateUtil.wrapInTransaction(session -> updateVocabulary(session, vocabObject, column),
-                                        e -> updateVocabularyExceptionHandler(e, vocabObject));
-    }
-
-    private boolean updateVocabulary(Session session, Vocabulary vocabObject, int column)
-    {
-        String queryString = buildUpdateQuery(column);
-        if(isNull(queryString))
-        {
-            return false;
-        }
-
-        Query query = session.createQuery(queryString);
-        query.setString("eword", vocabObject.getEnglishWord());
-        query.setString("fword", vocabObject.getForeignWord());
-        query.setInteger("fid", vocabObject.getForeignId());
-        query.executeUpdate();
-        return true;
-    }
-
-    private void updateVocabularyExceptionHandler(JDBCException e, Vocabulary vocabObject)
-    {
-        final String[] newWord = vocabObject.getEnglishWord().split(ENGLISH_WORD_SEPARATOR);    
-        JOptionPane.showMessageDialog(null, newWord[newWord.length - 1] + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-        this.logger.error(this.className, "updateVocabulary(Vocabulary, int)", e.getSQLException().getMessage(), e);
-    }
-
-    private String buildUpdateQuery(int column)
-    {
-        String queryString = "update Vocabulary set ";
-        switch(column)
-        {
-            case 0:
-                queryString += "english_word = :eword, last_updated = NOW() where foreign_word = :fword and foreign_id = :fid";
-                break;
-            case 1:
-                queryString += "foreign_word = :fword, last_updated = NOW() where english_word = :eword and foreign_id = :fid";
-                break;
-            default:
-                this.logger.error(this.className, "updateVocabulary(Vocabulary, int)", "Invalid table column " + column);
-                return null;
-        }
+        long start = System.currentTimeMillis();
         
-        return queryString;
+        Optional<Vocabulary> result = JPAUtil.transactAndReturn(em ->
+        {
+            Vocabulary vocabObject = em.find(Vocabulary.class, id);
+            vocabObject.setEnglishWord(englishWord);
+            vocabObject.setForeignWord(foreignWord);
+            return Optional.of(em.merge(vocabObject));
+        }, e -> updateVocabularyExceptionHandler(e, englishWord));
+
+        logger.info(className, "updateVocabulary", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
+
+        return result.get();
+    }
+
+    private void updateVocabularyExceptionHandler(Exception e, String englishWord)
+    { 
+        JOptionPane.showMessageDialog(null, englishWord + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
+        this.logger.error(this.className, "updateVocabulary", e.getMessage(), e);
     }
     
     /**
@@ -131,47 +132,51 @@ public class VocabularyRecord
      * @return vocabularies stored in a list
     */
     public List<Vocabulary> getVocabularies(final String letter)
-    {      
-        Session session = HibernateUtil.getInstance();
-        if(isNull(session))
-        {
-            return Collections.emptyList();
-        }
-
+    {
+        long start = System.currentTimeMillis();
         try
-        {      
-            Criteria criteria = buildGetVocabularyListCriteria(session, letter);
-            return HibernateUtil.listAndCast(criteria);
-        }
-        catch(final JDBCException e)
         {
-            this.logger.error(this.className, "getVocabularies(String)", e.getSQLException().getMessage(), e);
+            EntityManager em = JPAUtil.getEntityManager();
+
+            TypedQuery<Vocabulary> query = buildGetVocabularyListCriteria(em, letter);
+            return query.getResultList();
+        }
+        catch(final Exception e)
+        {
+            this.logger.error(this.className, "getVocabularies(String)", e.getMessage(), e);
         }
         finally
         {
-            session.close();
+            logger.info(className, "getVocabularies", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
         }
 
         return Collections.emptyList();
     }
 
-    private Criteria buildGetVocabularyListCriteria(Session session, String letter)
+    private TypedQuery<Vocabulary> buildGetVocabularyListCriteria(EntityManager em, String letter)
     {
-        Criteria criteria = session.createCriteria(Vocabulary.class);
-        criteria.add(Restrictions.eq("foreignId", MainFrameView.getforeignLanguage().getId()));     
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Vocabulary> query = criteriaBuilder.createQuery(Vocabulary.class);
+        Root<Vocabulary> vocabularyTable = query.from(Vocabulary.class);
+
+        Predicate whereClause = criteriaBuilder.equal(vocabularyTable.get("foreignLanguage"), MainFrameView.getforeignLanguage());
+
         switch(letter)
         {
             case "All":
-                criteria.addOrder(Order.asc("englishWord"));
+                query.orderBy(criteriaBuilder.asc(vocabularyTable.get("englishWord")));
                 break;
             case "Rec":
-                criteria.addOrder(Order.desc("lastUpdated"));
+                query.orderBy(criteriaBuilder.desc(vocabularyTable.get("lastUpdated")));
                 break;
-            default: 
-                criteria.add(Restrictions.ilike("englishWord", letter + "%"));
+            default:
+                whereClause = criteriaBuilder.and(whereClause, criteriaBuilder.like(vocabularyTable.get("englishWord"), letter + "%"));
+                query.orderBy(criteriaBuilder.asc(vocabularyTable.get("englishWord")));
         }
-        
-        return criteria;
+
+        query.where(whereClause);
+
+        return em.createQuery(query);
     }
     
     /**
@@ -179,6 +184,6 @@ public class VocabularyRecord
      */
     public void closeDB()
     {
-        HibernateUtil.close();
+        JPAUtil.closeEntityManager();
     }
 }

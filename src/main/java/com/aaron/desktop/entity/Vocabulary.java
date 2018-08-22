@@ -2,18 +2,23 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.aaron.desktop.model.db;
+package com.aaron.desktop.entity;
+
+import com.aaron.desktop.model.others.VocabularyTableCell;
+import static java.time.LocalDateTime.now;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -39,41 +44,40 @@ public class Vocabulary implements Serializable
     private String foreignWord;
 
     @Column(name = "datein", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateIn;
+    private LocalDateTime dateIn;
 
     @Column(name = "last_updated", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdated;
+    private LocalDateTime lastUpdated;
 
-    @Column(name = "foreign_id", nullable = false)
-    private int foreignId;
+    @ManyToOne
+    @JoinColumn(name = "foreign_id")
+    private ForeignLanguage foreignLanguage;
 
     /**
      * No-arg constructor.
      */
     public Vocabulary()
     {
-        this.dateIn = new Date();
-        this.lastUpdated = new Date();
     }
 
-    public Vocabulary(final String englishWord, final String foreignWord, final ForeignLanguage foreignLanguage)
+    public Vocabulary(String englishWord, String foreignWord, ForeignLanguage foreignLanguage)
     {
         this.englishWord = englishWord;
         this.foreignWord = foreignWord;
-        this.foreignId = foreignLanguage.getId();
-        this.dateIn = new Date();
-        this.lastUpdated = new Date();
+        this.foreignLanguage = foreignLanguage;
+    }
+    
+    @PrePersist
+    protected void onCreate()
+    {
+        this.dateIn = now();
+        this.lastUpdated = now();
     }
 
-    public Vocabulary(final String englishWord, final String foreignWord)
+    @PreUpdate
+    protected void onUpdate()
     {
-        this.englishWord = englishWord;
-        this.foreignWord = foreignWord;
-        this.foreignId = 1;
-        this.dateIn = new Date();
-        this.lastUpdated = new Date();
+        this.lastUpdated = now();
     }
 
     /**
@@ -127,7 +131,7 @@ public class Vocabulary implements Serializable
     /**
      * @return the dateIn
      */
-    public Date getDateIn() 
+    public LocalDateTime getDateIn() 
     {
         return this.dateIn;
     }
@@ -135,7 +139,7 @@ public class Vocabulary implements Serializable
     /**
      * @param dateIn the dateIn to set
      */
-    public void setDateIn(Date dateIn) 
+    public void setDateIn(LocalDateTime dateIn) 
     {
         this.dateIn = dateIn;
     }
@@ -143,7 +147,7 @@ public class Vocabulary implements Serializable
     /**
      * @return the lastUpdated
      */
-    public Date getLastUpdated()
+    public LocalDateTime getLastUpdated()
     {
         return this.lastUpdated;
     }
@@ -151,25 +155,25 @@ public class Vocabulary implements Serializable
     /**
      * @param lastUpdated the lastUpdated to set
      */
-    public void setLastUpdated(Date lastUpdated) 
+    public void setLastUpdated(LocalDateTime lastUpdated) 
     {
-        this.lastUpdated = (Date) lastUpdated.clone();
+        this.lastUpdated = lastUpdated;
     }
 
     /**
-     * @param foreignId the foreignId to set
+     * @param foreignLanguage the foreignLanguage to set
      */
-    public void setForeignId(int foreignId) 
+    public void setForeignLanguage(ForeignLanguage foreignLanguage) 
     {
-        this.foreignId = foreignId;
+        this.foreignLanguage = foreignLanguage;
     }
 
     /**
-     * @return the foreignId
+     * @return the foreignLanguage
      */
-    public int getForeignId()
+    public ForeignLanguage getForeignLanguage()
     {
-        return this.foreignId;
+        return this.foreignLanguage;
     }
     
     /**
@@ -178,7 +182,7 @@ public class Vocabulary implements Serializable
      */
     public Object[] getVocabularyAsObject()
     {
-        final Object[] vocabObject = { this.getEnglishWord(), this.getForeignWord() };
+        final Object[] vocabObject = { VocabularyTableCell.newWithIdAndWord(id, englishWord), VocabularyTableCell.newWithIdAndWord(id, foreignWord) };
 
         return vocabObject;
     }
@@ -205,7 +209,7 @@ public class Vocabulary implements Serializable
             
             return this.englishWord.equals(that.getEnglishWord()) && 
                    this.foreignWord.equals(that.getForeignWord()) &&
-                   this.foreignId == that.getForeignId();
+                   this.foreignLanguage.equals(that.getForeignLanguage());
         }
     }
 
@@ -219,7 +223,7 @@ public class Vocabulary implements Serializable
         int hash = 3;
         hash = 47 * hash + Objects.hashCode(this.englishWord);
         hash = 47 * hash + Objects.hashCode(this.foreignWord);
-        hash = 47 * hash + Objects.hashCode(this.foreignId);
+        hash = 47 * hash + Objects.hashCode(this.foreignLanguage);
         return hash;
     }
     
@@ -230,6 +234,6 @@ public class Vocabulary implements Serializable
     @Override
     public String toString()
     {
-        return "English: " + this.englishWord + " " + ForeignLanguage.values()[this.foreignId - 1] + ": " + this.foreignWord;
+        return "English: " + this.englishWord + " " + foreignLanguage.getLanguage() + ": " + this.foreignWord;
     }
 }

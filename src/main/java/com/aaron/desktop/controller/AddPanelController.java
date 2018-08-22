@@ -11,8 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
-import javax.swing.event.CaretEvent;
-import com.aaron.desktop.model.db.Vocabulary;
+import com.aaron.desktop.entity.Vocabulary;
 import com.aaron.desktop.model.db.VocabularyRecord;
 import com.aaron.desktop.view.AddPanelView;
 import com.aaron.desktop.view.MainFrameView;
@@ -72,9 +71,10 @@ public class AddPanelController
         }
         else
         {
-            boolean success = this.model.addToDatabase(new Vocabulary(this.view.getEnglishTextField().getText().trim(), 
-                                                                      this.view.getForeignTextField().getText().trim(), 
-                                                                      MainFrameView.getforeignLanguage()));
+            boolean success = this.model.saveToDatabase(new Vocabulary(this.view.getEnglishTextField().getText().trim(), 
+                                                                       this.view.getForeignTextField().getText().trim(), 
+                                                                       MainFrameView.getforeignLanguage()));
+
             if(success)
             {
                 this.view.clearTextfields();

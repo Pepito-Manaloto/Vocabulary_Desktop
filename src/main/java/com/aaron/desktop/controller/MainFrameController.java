@@ -1,7 +1,7 @@
 package com.aaron.desktop.controller;
 
-import com.aaron.desktop.model.db.ForeignLanguage;
-import com.aaron.desktop.model.db.Vocabulary;
+import com.aaron.desktop.entity.ForeignLanguage;
+import com.aaron.desktop.entity.Vocabulary;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -32,6 +32,11 @@ import com.aaron.desktop.view.LogFrameView;
 import com.aaron.desktop.view.MainFrameView;
 import static com.aaron.desktop.view.MainFrameView.PanelName.Add;
 import static com.aaron.desktop.view.MainFrameView.PanelName.View;
+import java.util.Map;
+import java.util.TreeMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.time.FastDateFormat;
 
@@ -54,6 +59,7 @@ public class MainFrameController
     private final MainFrameView view;
     private final VocabularyRecord model;
     private final Mailer mailer;
+    private Map<String, ForeignLanguage> foreignLanguages;
 
     public MainFrameController(final MainFrameView view, final VocabularyRecord model, final Mailer mailer)
     {
@@ -64,7 +70,8 @@ public class MainFrameController
 
     // adds event listener to all mainFrame's component.
     public void addListeners()
-    {   
+    {
+        initializeForeignLanguageCombobox();
         this.view.addAddButtonListener(this::addButtonListener);
         this.view.addViewButtonListener(this::viewButtonListener);
         this.view.addForeignLanguageComboBoxListener(this::foreignLanguageComboBoxListener);
@@ -75,6 +82,17 @@ public class MainFrameController
         this.view.addShowLogsMenuItemListener(this::showLogsMenuItemListener);
     }
 
+    private void initializeForeignLanguageCombobox()
+    {
+        List<ForeignLanguage> languages = model.getForeignLanguages();
+        foreignLanguages = languages.stream().collect(
+                toMap(ForeignLanguage::getLanguageName, identity(), (l1, l2) -> l1,
+                        () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
+
+        MainFrameView.setForeignLanguage(languages.get(0));
+        this.view.setForeignLanguageComboBoxItems(languages.stream().map(ForeignLanguage::getLanguageName).collect(toList()));
+    }
+    
     private void addButtonListener(ActionEvent e)
     {
         view.showPanel(Add);
@@ -93,7 +111,8 @@ public class MainFrameController
         }
         else
         {
-            view.getViewPanelView().refreshTable(vocabList);view.showPanel(View);
+            view.getViewPanelView().refreshTable(vocabList);
+            view.showPanel(View);
             view.getSearchTextField().setVisible(true);
             view.getAddPanelView().clearTextfields();
         }
@@ -141,12 +160,14 @@ public class MainFrameController
             }
         }
     }
-    
+
     private void foreignLanguageComboBoxListener(ActionEvent e)
     {
-        view.getAddPanelView().setLanguageLabel(view.getForeignLanguageComboBoxItem());
-        view.getViewPanelView().changeSecondColumnHeaderName(view.getForeignLanguageComboBoxItem());
-        MainFrameView.setForeignLanguage(ForeignLanguage.valueOf(view.getForeignLanguageComboBoxItem()));
+        ForeignLanguage language = foreignLanguages.get(view.getForeignLanguageComboBoxItem());
+
+        view.getAddPanelView().setLanguageLabel(language.getLanguageName());
+        view.getViewPanelView().changeSecondColumnHeaderName(language.getLanguageName());
+        MainFrameView.setForeignLanguage(language);
         view.getViewPanelView().refreshTable(model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem()));
     }
     

@@ -10,7 +10,6 @@
  */
 package com.aaron.desktop.view;
 
-import com.aaron.desktop.model.db.ForeignLanguage;
 import java.awt.CardLayout;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -25,9 +24,9 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
-import com.aaron.desktop.model.others.Resource;
+import com.aaron.desktop.constant.Resource;
 
-import static com.aaron.desktop.model.db.ForeignLanguage.*;
+import com.aaron.desktop.entity.ForeignLanguage;
 import static com.aaron.desktop.view.MainFrameView.PanelName.*;
 
 /**
@@ -48,7 +47,7 @@ public final class MainFrameView extends javax.swing.JFrame
     private final ViewPanelView view;
     private final AddPanelView add;
     private JTextField searchTextField;
-    private static ForeignLanguage selectedForeignLanguage = ForeignLanguage.Hokkien;
+    private static ForeignLanguage selectedForeignLanguage;
 
     /**
      * Sets up the background image, Layout, and actionListeners.
@@ -62,8 +61,6 @@ public final class MainFrameView extends javax.swing.JFrame
         this.initComponents();
         this.setSize(891,561);
 
-        setForeignLanguage(Hokkien);
-
         this.cardLayout = new CardLayout();
         this.setIconImage(new ImageIcon(getClass().getResource(Resource.IMAGE_ICON)).getImage());
 
@@ -73,10 +70,17 @@ public final class MainFrameView extends javax.swing.JFrame
         
         this.searchTextField.setVisible(false);    
         this.suggestListScrollPane.setVisible(false); 
-
-        for(ForeignLanguage language: ForeignLanguage.values())
+    }
+    
+     /**
+     * Sets the foreign language combo box.
+     * @param list the list of foreign languages, expects non-empty list
+     */
+    public void setForeignLanguageComboBoxItems(List<String> list)
+    {
+        for(String language: list)
         {
-            this.foreignLanguageComboBox.addItem(language.toString());
+            foreignLanguageComboBox.addItem(language);
         }
     }
 
@@ -220,7 +224,7 @@ public final class MainFrameView extends javax.swing.JFrame
 
     /**
      * Returns the selected language.
-     * @return enum ForeignLanguage.
+     * @return ForeignLanguage.
      */
     public static ForeignLanguage getforeignLanguage()
     {

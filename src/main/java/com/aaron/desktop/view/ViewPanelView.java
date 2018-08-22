@@ -16,11 +16,9 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import com.aaron.desktop.model.db.Vocabulary;
+import com.aaron.desktop.entity.Vocabulary;
 
-import static com.aaron.desktop.model.db.ForeignLanguage.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import static com.aaron.desktop.constant.ForeignLanguageName.*;
 
 /**
  * View panel of Vocabulary
@@ -119,12 +117,13 @@ public final class ViewPanelView extends javax.swing.JPanel {
     public void refreshTable(final List<Vocabulary> vocabularyList) 
     {
         this.table.getDataVector().removeAllElements(); // Clears the table
+ 
+        for(Vocabulary vocabulary: vocabularyList)
+        {
+            this.table.addRow(vocabulary.getVocabularyAsObject());
+        }
 
-        Function<Vocabulary, Object[]> vocabularyToObjectArray = (v) -> v.getVocabularyAsObject();
-        Consumer<Object[]> addVocabularyToTable = (v) -> this.table.addRow(v);
-        vocabularyList.stream().map(vocabularyToObjectArray).forEach(addVocabularyToTable);
-
-        if(Hokkien.equals(MainFrameView.getforeignLanguage()))
+        if(Hokkien.equals(MainFrameView.getforeignLanguage().getLanguage()))
         {
             setVocabularyTablePropertiesOnEnglishCharacters();
         }

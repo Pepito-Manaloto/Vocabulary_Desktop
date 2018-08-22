@@ -11,11 +11,13 @@ import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import com.aaron.desktop.model.db.Vocabulary;
+import com.aaron.desktop.entity.Vocabulary;
 import com.aaron.desktop.model.db.VocabularyRecord;
+import com.aaron.desktop.model.others.VocabularyTableCell;
 import com.aaron.desktop.view.MainFrameView;
 import com.aaron.desktop.view.ViewPanelView;
 import java.awt.event.ActionListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -65,22 +67,40 @@ public class ViewPanelController
         public void tableChanged(final TableModelEvent e)
         {
             boolean isCellUpdated = e.getLastRow() >= 0 && e.getType() == 0;
-            if (isCellUpdated)
+            if(isCellUpdated)
             {
-                String wordEnglish = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 0).toString();
-                String wordForeign = this.view.getDefaultTableModel().getValueAt(e.getLastRow(), 1).toString();
+                VocabularyTableCell vocabJTable = getVocabularyTableCellFromJTable(e.getLastRow(), view.getDefaultTableModel());
+                
+                String wordEnglish = view.getDefaultTableModel().getValueAt(e.getLastRow(), 0).toString();
+                String wordForeign = view.getDefaultTableModel().getValueAt(e.getLastRow(), 1).toString();
 
                 int response = JOptionPane.showConfirmDialog(this.view, "Do you want to save?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-                if (response == JOptionPane.YES_OPTION)
+                if(response == JOptionPane.YES_OPTION)
                 {
-                    this.model.updateVocabulary(new Vocabulary(wordEnglish, wordForeign, MainFrameView.getforeignLanguage()),
-                                                e.getColumn());
-                }
-                else
-                {
+                    this.model.updateVocabulary(vocabJTable.getId(), wordEnglish, wordForeign);
                     this.view.refreshTable(this.model.getVocabularies(this.view.getLetterComboBoxItem()));
                 }
+            }
+        }
+        
+        private VocabularyTableCell getVocabularyTableCellFromJTable(int lastRow, DefaultTableModel table)
+        {
+            Object column1 = view.getDefaultTableModel().getValueAt(lastRow, 0);
+            Object column2 = view.getDefaultTableModel().getValueAt(lastRow, 1);
+
+            if(column1 instanceof VocabularyTableCell)
+            {
+                return (VocabularyTableCell) column1;
+            }
+            else if(column2 instanceof VocabularyTableCell)
+            {
+                return (VocabularyTableCell) column2;
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(view, "Failed getting vocabulary info from cell to update", "Error", JOptionPane.ERROR_MESSAGE);
+                throw new IllegalStateException("Expecting one of the cell to be VocabularyTableCell type.");
             }
         }
     }
