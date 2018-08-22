@@ -4,6 +4,7 @@
  */
 package com.aaron.desktop.model.others;
 
+import com.aaron.desktop.model.db.JPAUtil;
 import com.aaron.desktop.model.db.VocabularyRecord;
 
 /**
@@ -33,6 +34,6 @@ public final class ShutDownHookHandler extends Thread
     public void run()
     {
         this.appLock.releaseResources();
-        this.vRecord.closeDB();
+        JPAUtil.shutdown();
     }
 }

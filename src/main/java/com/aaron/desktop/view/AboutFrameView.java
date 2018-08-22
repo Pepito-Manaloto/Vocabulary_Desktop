@@ -6,11 +6,7 @@
 
 package com.aaron.desktop.view;
 
-import com.aaron.desktop.main.Main;
-import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Vendor;
-import static com.aaron.desktop.main.Main.ManifestAttribute.Implementation_Version;
-import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Title;
-import static com.aaron.desktop.main.Main.ManifestAttribute.Specification_Version;
+import static com.aaron.desktop.constant.ManifestAttribute.*;
 
 /**
  *
@@ -30,10 +26,10 @@ public final class AboutFrameView extends javax.swing.JFrame
 
     public void setLabels()
     {
-        this.titleLabel.setText(Main.getInfo(Specification_Title));
-        this.authorLabel.setText(Main.getInfo(Implementation_Vendor));
-        this.versionLabel.setText(Main.getInfo(Specification_Version));
-        this.buildVersionLabel.setText(Main.getInfo(Implementation_Version));
+        this.titleLabel.setText(getInfo(Specification_Title));
+        this.authorLabel.setText(getInfo(Implementation_Vendor));
+        this.versionLabel.setText(getInfo(Specification_Version));
+        this.buildVersionLabel.setText(getInfo(Implementation_Version));
     }
 
     /**

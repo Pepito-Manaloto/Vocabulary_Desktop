@@ -8,14 +8,11 @@ package com.aaron.desktop.model.db;
 import static java.util.Objects.*;
 
 import com.aaron.desktop.model.log.LogManager;
-import com.aaron.desktop.model.others.Resource;
-import java.util.List;
+import com.aaron.desktop.constant.Resource;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -26,6 +23,7 @@ import org.hibernate.cfg.Configuration;
  *
  * @author Aaron
  */
+@Deprecated
 public final class HibernateUtil 
 {
     private static SessionFactory sessionFactory;
@@ -46,20 +44,6 @@ public final class HibernateUtil
     private HibernateUtil()
     {}
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> listAndCast(final Query q)
-    {
-        List<T> list = q.list();
-        return list;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> listAndCast(final Criteria q)
-    {
-        List<T> list = q.list();
-        return list;
-    }
-
     public static Session getInstance()
     {
         try
@@ -70,7 +54,7 @@ public final class HibernateUtil
             }
 
             Session session = sessionFactory.openSession();
-        
+
             return session;
         }
         catch(HibernateException ex)

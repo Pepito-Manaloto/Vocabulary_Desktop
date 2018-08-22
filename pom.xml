@@ -14,21 +14,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- Custom properties -->
         <junit.version>4.12</junit.version>
-        <mysql.version>5.1.34</mysql.version>
-        <log4j-api.version>2.1</log4j-api.version>
-        <log4j-core.version>2.1</log4j-core.version>
-        <apache-commons-lang3.version>3.7</apache-commons-lang3.version>
-        <apache-commons-email.version>1.4</apache-commons-email.version>
-
-        <hibernate-core.version>4.3.8.Final</hibernate-core.version>
-        <hibernate-validator.version>4.3.2.Final</hibernate-validator.version>
-        <hibernate-commons-annotations.version>4.0.5.Final</hibernate-commons-annotations.version>
-        <hibernate-jpa-api.version>1.0.1.Final</hibernate-jpa-api.version>
-        <hibernate-entitymanager.version>4.3.8.Final</hibernate-entitymanager.version>
-        <javax-validation.version>1.1.0.Final</javax-validation.version>
-        <slf4j-api.version>1.7.10</slf4j-api.version>
-        <jboss-logging.version>3.2.1.Final</jboss-logging.version>
-        <slf4j-log4j12.version>1.7.10</slf4j-log4j12.version>
+        <mysql.version>5.1.47</mysql.version>
+        <log4j.version>2.11.1</log4j.version>
+        <apache-commons-lang3.version>3.8</apache-commons-lang3.version>
+        <apache-commons-email.version>1.5</apache-commons-email.version>
+        <hibernate-core.version>5.3.5.Final</hibernate-core.version>
+        <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
     <dependencies>
@@ -38,20 +29,32 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>${log4j-api.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>${log4j-core.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-email</artifactId>
-                <version>${apache-commons-email.version}</version>
+        <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>${apache-commons-email.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -66,43 +69,8 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.common</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-            <version>${hibernate-commons-annotations.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>${hibernate-jpa-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate-entitymanager.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>${javax-validation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>${jboss-logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-log4j12.version}</version>
+            <artifactId>hibernate-hikaricp</artifactId>
+            <version>${hibernate-core.version}</version>
         </dependency>
         
         <dependency>
@@ -118,7 +86,7 @@
 
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                   <filesets>
                     <fileset>
@@ -131,7 +99,7 @@
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.0</version>
                 <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
@@ -141,7 +109,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
                 <configuration>
                     <archive>
                         <index>false</index>
@@ -165,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
