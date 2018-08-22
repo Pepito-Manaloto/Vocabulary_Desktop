@@ -13,9 +13,6 @@ import com.aaron.desktop.model.others.ShutDownHookHandler;
 import com.aaron.desktop.view.AddPanelView;
 import com.aaron.desktop.view.ViewPanelView;
 import com.aaron.desktop.model.others.Mailer;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 /**
  * Main class of Main.
@@ -24,26 +21,6 @@ import java.util.Properties;
  */
 public final class Main
 {
-    private static final Properties PROPERTIES;
-
-    static
-    {
-        try
-        {
-            PROPERTIES = new Properties();
-            PROPERTIES.load(new FileInputStream("conf/vocabulary.conf"));
-
-            PROPERTIES.entrySet().stream().forEach((entry) ->
-            {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            });
-        }
-        catch (IOException ex)
-        {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
-
     /**
      * Initialize the vocabulary frame.
      * @param args
@@ -53,8 +30,8 @@ public final class Main
         setLog4j2AsyncProperties();
 
         VocabularyRecord vRecord = new VocabularyRecord();
-        Mailer mailer = new Mailer(PROPERTIES.getProperty(Config.EMAIL_SENDER.toString()),
-                                         PROPERTIES.getProperty(Config.EMAIL_RECIPIENT.toString()));
+        Mailer mailer = new Mailer(PropertiesConfig.getProperty(Config.EMAIL_SENDER),
+                                   PropertiesConfig.getProperty(Config.EMAIL_RECIPIENT));
 
         ApplicationLock appLock = lockApplication();
         Runtime.getRuntime().addShutdownHook(new ShutDownHookHandler(appLock, vRecord));
@@ -65,7 +42,7 @@ public final class Main
     private static void setLog4j2AsyncProperties()
     {
         // Set log4j2 async property
-        System.setProperty("log4j.configurationFile", PROPERTIES.getProperty(Config.LOG4J_CONF.toString()));
+        System.setProperty("log4j.configurationFile", PropertiesConfig.getProperty(Config.LOG4J_CONF));
         System.setProperty("DLog4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
     

@@ -11,9 +11,9 @@ package com.aaron.desktop.constant;
 public enum Config
 {
     DB_URL("db.url"),
-    DB_DRIVER("db.driver"),
     DB_USER("db.user"),
     DB_PASS("db.pass"),
+    HIBERNATE_DEBUG("hibernate.debug"),
     EMAIL_SENDER("email.sender"),
     EMAIL_RECIPIENT("email.recipient"),
     LOG4J_CONF("log4j.conf");

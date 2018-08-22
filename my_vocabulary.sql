@@ -7,6 +7,8 @@ CREATE TABLE `foreign_language`
    PRIMARY KEY(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+INSERT INTO `foreign_language` VALUES (1,'Hokkien'),(2,'Japanese'),(3,'Mandarin');
+
 CREATE TABLE `vocabulary`
 (
    `id` INT UNSIGNED AUTO_INCREMENT,
