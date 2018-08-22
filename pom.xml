@@ -14,21 +14,18 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- Custom properties -->
         <junit.version>4.12</junit.version>
-        <mysql.version>5.1.34</mysql.version>
-        <log4j-api.version>2.1</log4j-api.version>
-        <log4j-core.version>2.1</log4j-core.version>
-        <apache-commons-lang3.version>3.7</apache-commons-lang3.version>
-        <apache-commons-email.version>1.4</apache-commons-email.version>
+        <mysql.version>8.0.12</mysql.version>
+        <log4j.version>2.11.1</log4j.version>
+        <apache-commons-lang3.version>3.8</apache-commons-lang3.version>
+        <apache-commons-email.version>1.5</apache-commons-email.version>
 
-        <hibernate-core.version>4.3.8.Final</hibernate-core.version>
-        <hibernate-validator.version>4.3.2.Final</hibernate-validator.version>
-        <hibernate-commons-annotations.version>4.0.5.Final</hibernate-commons-annotations.version>
-        <hibernate-jpa-api.version>1.0.1.Final</hibernate-jpa-api.version>
-        <hibernate-entitymanager.version>4.3.8.Final</hibernate-entitymanager.version>
-        <javax-validation.version>1.1.0.Final</javax-validation.version>
-        <slf4j-api.version>1.7.10</slf4j-api.version>
-        <jboss-logging.version>3.2.1.Final</jboss-logging.version>
-        <slf4j-log4j12.version>1.7.10</slf4j-log4j12.version>
+        <hibernate-core.version>5.3.5.Final</hibernate-core.version>
+        <hibernate-validator.version>6.0.12.Final</hibernate-validator.version>
+        <hibernate-commons-annotations.version>5.0.4.Final</hibernate-commons-annotations.version>
+        <hibernate-jpa-api.version>1.0.2.Final</hibernate-jpa-api.version>
+        <javax-validation.version>2.0.1.Final</javax-validation.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <jboss-logging.version>3.3.2.Final</jboss-logging.version>
     </properties>
 
     <dependencies>
@@ -41,12 +38,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>${log4j-api.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>${log4j-core.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -76,13 +73,8 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>${hibernate-jpa-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate-entitymanager.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -92,7 +84,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -102,7 +94,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-log4j12.version}</version>
+            <version>${slf4j.version}</version>
         </dependency>
         
         <dependency>
@@ -118,7 +110,7 @@
 
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                   <filesets>
                     <fileset>
@@ -131,7 +123,7 @@
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.0</version>
                 <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
@@ -141,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
                 <configuration>
                     <archive>
                         <index>false</index>
@@ -165,7 +157,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
