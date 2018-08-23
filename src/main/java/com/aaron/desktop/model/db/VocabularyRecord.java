@@ -6,11 +6,13 @@ package com.aaron.desktop.model.db;
 
 import com.aaron.desktop.entity.ForeignLanguage;
 import com.aaron.desktop.entity.Vocabulary;
+import com.aaron.desktop.entity.Vocabulary_;
 
 import com.aaron.desktop.model.log.LogManager;
 import java.util.List;
 import javax.swing.JOptionPane;
 import com.aaron.desktop.view.MainFrameView;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -41,7 +44,7 @@ public class VocabularyRecord
 
         logger.info(className, "getForeignLanguages", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
         //vocabulariesMap = list.stream().collect(toMap(identity(), ForeignLanguage::getVocabularies));
-     
+
         return list;
     }
 
@@ -61,7 +64,7 @@ public class VocabularyRecord
         }, e -> saveVocabularyExceptionHandler(e, vocabObject));
         
         logger.info(className, "saveToDatabase", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
-        
+
         return result.orElse(false);
     }
 
@@ -123,7 +126,7 @@ public class VocabularyRecord
     private void updateVocabularyExceptionHandler(Exception e, String englishWord)
     { 
         JOptionPane.showMessageDialog(null, englishWord + " is already in the database.", "Note", JOptionPane.INFORMATION_MESSAGE);
-        this.logger.error(this.className, "updateVocabulary", e.getMessage(), e);
+        logger.error(this.className, "updateVocabulary", e.getMessage(), e);
     }
     
     /**
@@ -143,14 +146,13 @@ public class VocabularyRecord
         }
         catch(final Exception e)
         {
-            this.logger.error(this.className, "getVocabularies(String)", e.getMessage(), e);
+            logger.error(this.className, "getVocabularies(String)", e.getMessage(), e);
+            return null;
         }
         finally
         {
             logger.info(className, "getVocabularies", "Total exec time: " + (System.currentTimeMillis() - start) + "ms");
         }
-
-        return Collections.emptyList();
     }
 
     private TypedQuery<Vocabulary> buildGetVocabularyListCriteria(EntityManager em, String letter)
@@ -158,20 +160,21 @@ public class VocabularyRecord
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Vocabulary> query = criteriaBuilder.createQuery(Vocabulary.class);
         Root<Vocabulary> vocabularyTable = query.from(Vocabulary.class);
+        vocabularyTable.fetch(Vocabulary_.foreignLanguage, JoinType.INNER);
+        query.select(vocabularyTable);
 
-        Predicate whereClause = criteriaBuilder.equal(vocabularyTable.get("foreignLanguage"), MainFrameView.getforeignLanguage());
-
+        Predicate whereClause = criteriaBuilder.equal(vocabularyTable.get(Vocabulary_.foreignLanguage), MainFrameView.getforeignLanguage());
         switch(letter)
         {
             case "All":
-                query.orderBy(criteriaBuilder.asc(vocabularyTable.get("englishWord")));
+                query.orderBy(criteriaBuilder.asc(vocabularyTable.get(Vocabulary_.englishWord)));
                 break;
             case "Rec":
-                query.orderBy(criteriaBuilder.desc(vocabularyTable.get("lastUpdated")));
+                query.orderBy(criteriaBuilder.desc(vocabularyTable.get(Vocabulary_.lastUpdated)));
                 break;
             default:
-                whereClause = criteriaBuilder.and(whereClause, criteriaBuilder.like(vocabularyTable.get("englishWord"), letter + "%"));
-                query.orderBy(criteriaBuilder.asc(vocabularyTable.get("englishWord")));
+                whereClause = criteriaBuilder.and(whereClause, criteriaBuilder.like(vocabularyTable.get(Vocabulary_.englishWord), letter + "%"));
+                query.orderBy(criteriaBuilder.asc(vocabularyTable.get(Vocabulary_.englishWord)));
         }
 
         query.where(whereClause);

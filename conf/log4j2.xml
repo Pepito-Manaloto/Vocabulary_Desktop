@@ -34,7 +34,7 @@
             <AppenderRef ref="LOCAL" />
         </Logger>
 
-        <Logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+        <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace" additivity="false">
             <AppenderRef ref="LOCAL" />
         </Logger>
     </Loggers>

@@ -33,11 +33,11 @@ import com.aaron.desktop.view.MainFrameView;
 import static com.aaron.desktop.view.MainFrameView.PanelName.Add;
 import static com.aaron.desktop.view.MainFrameView.PanelName.View;
 import java.util.Map;
+import static java.util.Objects.isNull;
 import java.util.TreeMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import java.util.stream.IntStream;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 /*
@@ -105,7 +105,7 @@ public class MainFrameController
     {
         List<Vocabulary> vocabList = model.getVocabularies(view.getViewPanelView().getLetterComboBoxItem());
 
-        if(vocabList.isEmpty())
+        if(isNull(vocabList))
         {
             JOptionPane.showMessageDialog(view, "Unable to access database", "Error", JOptionPane.ERROR_MESSAGE);
         }

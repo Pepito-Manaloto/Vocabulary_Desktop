@@ -8,6 +8,7 @@ import com.aaron.desktop.controller.AddPanelController;
 import com.aaron.desktop.controller.MainFrameController;
 import com.aaron.desktop.controller.ViewPanelController;
 import com.aaron.desktop.model.db.VocabularyRecord;
+import com.aaron.desktop.model.log.LogManager;
 import com.aaron.desktop.model.others.ApplicationLock;
 import com.aaron.desktop.model.others.ShutDownHookHandler;
 import com.aaron.desktop.view.AddPanelView;
@@ -56,23 +57,32 @@ public final class Main
     
     private static void initializeViewControllerAndAddListeners(final VocabularyRecord vRecord, final Mailer mailer)
     {
-        EventQueue.invokeLater(() -> {
-            ViewManager.init();
-            
-            AddPanelView addPanel = new AddPanelView();
-            ViewPanelView viewPanel = new ViewPanelView();
-            AddPanelController addController = new AddPanelController(addPanel, vRecord);
-            ViewPanelController viewController = new ViewPanelController(viewPanel, vRecord);
-            
-            MainFrameView mainView = new MainFrameView(addPanel, viewPanel);
-            MainFrameController mainController = new MainFrameController(mainView, vRecord, mailer);
-            
-            addController.addListeners();
-            viewController.addListeners();
-            mainController.addListeners();
-            
-            mainView.setLocationRelativeTo(null);
-            mainView.setVisible(true);
+        EventQueue.invokeLater(() ->
+        {
+            try
+            {
+                ViewManager.init();
+
+                AddPanelView addPanel = new AddPanelView();
+                ViewPanelView viewPanel = new ViewPanelView();
+                AddPanelController addController = new AddPanelController(addPanel, vRecord);
+                ViewPanelController viewController = new ViewPanelController(viewPanel, vRecord);
+
+                MainFrameView mainView = new MainFrameView(addPanel, viewPanel);
+                MainFrameController mainController = new MainFrameController(mainView, vRecord, mailer);
+
+                addController.addListeners();
+                viewController.addListeners();
+                mainController.addListeners();
+
+                mainView.setLocationRelativeTo(null);
+                mainView.setVisible(true);
+            }
+            catch(Exception e)
+            {
+                System.err.println("Error starting application. Error: " + e.getMessage());
+                System.exit(1);
+            }
         });
     }
 }

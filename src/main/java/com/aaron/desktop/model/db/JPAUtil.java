@@ -7,6 +7,7 @@ package com.aaron.desktop.model.db;
 
 import com.aaron.desktop.constant.Config;
 import com.aaron.desktop.main.PropertiesConfig;
+import com.aaron.desktop.model.log.LogManager;
 import static com.aaron.desktop.model.others.EncryptionUtil.decrypt;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.hibernate.cfg.Environment;
  */
 public final class JPAUtil
 {
+    private final static LogManager logger = LogManager.getInstance();
     private final static String className = JPAUtil.class.getSimpleName();
 
     private static final String PERSISTENCE_UNIT_NAME = "VocabularyDB";
@@ -52,7 +54,7 @@ public final class JPAUtil
         }
         catch (Exception ex)
         {
-            System.err.println("Failed decrypting database properties(url, user, pw). Error: " + ex.getMessage());
+            logger.fatal(className, "loadEntityManagerFactoryProperties", "Failed decrypting database properties(url, user, pw)", ex);
             System.exit(1);
         }
 
